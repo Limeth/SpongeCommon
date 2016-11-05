@@ -121,11 +121,6 @@ public abstract class MixinTileEntityHopper extends MixinTileEntityLockableLoot 
         return (TileEntityInventory<TileEntityCarrier>) this;
     }
 
-    @Intrinsic
-    public void tilentityinventory$markDirty() {
-        this.markDirty();
-    }
-
     public SlotProvider<IInventory, ItemStack> inventory$getSlotProvider() {
         return this.slots;
     }
@@ -137,6 +132,12 @@ public abstract class MixinTileEntityHopper extends MixinTileEntityLockableLoot 
     public Fabric<IInventory> inventory$getInventory() {
         return this.fabric;
     }
+
+    // TODO is this needed here? The same could be done in MixinTileEntityLockable
+    @Intrinsic
+    public void tilentityinventory$markDirty() {
+        this.markDirty();
+    } // TODO wrong prefix?
 
     public Optional<Hopper> tileentityinventory$getTileEntity() {
         return Optional.of(this);
