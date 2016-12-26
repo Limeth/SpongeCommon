@@ -278,7 +278,7 @@ public final class ContainerUtil {
                     || lens.slotCount() != slotCount) { // Inventory size <> Lens size
                 if (entry.getKey() instanceof InventoryCraftResult) { // InventoryCraftResult is always a Slot
                     Slot slot = entry.getValue().get(0);
-                    lens = new OutputSlotLensImpl(index, item -> slot.isItemValid(((ItemStack) item)),
+                    lens = new CraftingOutputSlotLensImpl(index, item -> slot.isItemValid(((ItemStack) item)),
                             itemType -> (slot.isItemValid((ItemStack) org.spongepowered.api.item.inventory.ItemStack.of(itemType, 1))));
                 } else if (entry.getKey() instanceof InventoryCrafting) { // InventoryCrafting has width and height
                     InventoryCrafting craftGrid = (InventoryCrafting) entry.getKey();
