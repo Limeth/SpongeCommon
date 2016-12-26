@@ -99,11 +99,11 @@ public abstract class MixinTileEntityLockable extends MixinTileEntity implements
         return (TileEntityInventory<TileEntityCarrier>) this;
     }
 
-    public Optional tileentityinventory$getTileEntity() {
+    public Optional<? extends TileEntityCarrier> tileentityinventory$getTileEntity() {
         return Optional.of(this);
     }
 
-    public Optional tileentityinventory$getCarrier() {
+    public Optional<? extends TileEntityCarrier> tileentityinventory$getCarrier() {
         return Optional.of(this);
     }
 }

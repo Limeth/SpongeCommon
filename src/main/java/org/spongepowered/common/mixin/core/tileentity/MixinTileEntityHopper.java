@@ -33,15 +33,12 @@ import net.minecraft.tileentity.TileEntity;
 import net.minecraft.tileentity.TileEntityHopper;
 import net.minecraft.util.math.BlockPos;
 import org.spongepowered.api.block.tileentity.carrier.Hopper;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.data.manipulator.DataManipulator;
 import org.spongepowered.api.data.manipulator.mutable.tileentity.CooldownData;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -65,8 +62,7 @@ import java.util.Optional;
 
 @NonnullByDefault
 @Mixin(TileEntityHopper.class)
-@Implements({@Interface(iface = MinecraftInventoryAdapter.class, prefix = "inventory$"),
-        @Interface(iface = TileEntityInventory.class, prefix = "tileentityinventory$")})
+@Implements(@Interface(iface = MinecraftInventoryAdapter.class, prefix = "inventory$"))
 public abstract class MixinTileEntityHopper extends MixinTileEntityLockableLoot implements Hopper, IMixinCustomNameable {
 
     @Shadow private int transferCooldown;
@@ -115,12 +111,6 @@ public abstract class MixinTileEntityHopper extends MixinTileEntityLockableLoot 
         ((TileEntityHopper) (Object) this).setCustomName(customName);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return (TileEntityInventory<TileEntityCarrier>) this;
-    }
-
     public SlotProvider<IInventory, ItemStack> inventory$getSlotProvider() {
         return this.slots;
     }
@@ -131,19 +121,5 @@ public abstract class MixinTileEntityHopper extends MixinTileEntityLockableLoot 
 
     public Fabric<IInventory> inventory$getInventory() {
         return this.fabric;
-    }
-
-    // TODO is this needed here? The same could be done in MixinTileEntityLockable
-    @Intrinsic
-    public void tilentityinventory$markDirty() {
-        this.markDirty();
-    } // TODO wrong prefix?
-
-    public Optional<Hopper> tileentityinventory$getTileEntity() {
-        return Optional.of(this);
-    }
-
-    public Optional<Hopper> tileentityinventory$getCarrier() {
-        return Optional.of(this);
     }
 }

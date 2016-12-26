@@ -117,12 +117,4 @@ public abstract class MixinTileEntityBrewingStand extends MixinTileEntityLockabl
     public void tilentityinventory$markDirty() {
         this.markDirty();
     } // TODO wrong prefix?
-
-    public Optional<BrewingStand> tileentityinventory$getTileEntity() {
-        return Optional.of(this);
-    }
-
-    public Optional<BrewingStand> tileentityinventory$getCarrier() {
-        return Optional.of(this);
-    }
 }

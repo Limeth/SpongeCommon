@@ -31,13 +31,10 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import net.minecraft.tileentity.TileEntityDispenser;
 import org.spongepowered.api.block.tileentity.carrier.Dispenser;
-import org.spongepowered.api.block.tileentity.carrier.TileEntityCarrier;
 import org.spongepowered.api.entity.projectile.Projectile;
-import org.spongepowered.api.item.inventory.type.TileEntityInventory;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
 import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
-import org.spongepowered.asm.mixin.Intrinsic;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -56,8 +53,7 @@ import java.util.Optional;
 
 @NonnullByDefault
 @Mixin(TileEntityDispenser.class)
-@Implements({@Interface(iface = MinecraftInventoryAdapter.class, prefix = "inventory$"),
-        @Interface(iface = TileEntityInventory.class, prefix = "tileentityinventory$")})
+@Implements(@Interface(iface = MinecraftInventoryAdapter.class, prefix = "inventory$"))
 public abstract class MixinTileEntityDispenser extends MixinTileEntityLockable implements Dispenser, IMixinCustomNameable {
 
     private Fabric<IInventory> fabric;
@@ -88,12 +84,6 @@ public abstract class MixinTileEntityDispenser extends MixinTileEntityLockable i
         ((TileEntityDispenser) (Object) this).setCustomName(customName);
     }
 
-    @SuppressWarnings("unchecked")
-    @Override
-    public TileEntityInventory<TileEntityCarrier> getInventory() {
-        return (TileEntityInventory<TileEntityCarrier>) this;
-    }
-
     public SlotProvider<IInventory, ItemStack> inventory$getSlotProvider() {
         return this.slots;
     }
@@ -104,19 +94,5 @@ public abstract class MixinTileEntityDispenser extends MixinTileEntityLockable i
 
     public Fabric<IInventory> inventory$getInventory() {
         return this.fabric;
-    }
-
-    // TODO is this needed here? The same could be done in MixinTileEntityLockable
-    @Intrinsic
-    public void tilentityinventory$markDirty() {
-        this.markDirty();
-    } // TODO wrong prefix?
-
-    public Optional<Dispenser> tileentityinventory$getTileEntity() {
-        return Optional.of(this);
-    }
-
-    public Optional<Dispenser> tileentityinventory$getCarrier() {
-        return Optional.of(this);
     }
 }
