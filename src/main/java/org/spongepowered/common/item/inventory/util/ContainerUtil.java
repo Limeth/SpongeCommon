@@ -223,14 +223,10 @@ public final class ContainerUtil {
     @SuppressWarnings("unchecked")
     @Nullable
     public static Lens<IInventory, ItemStack> getLens(Fabric<IInventory> fabric, net.minecraft.inventory.Container container, SlotCollection slots) {
-        // TODO use fabric instead if possible?
-
-        System.out.print("### getLens for: " + container.getClass().getName() + " ###\n");
         // Container is Adapter?
         if (container instanceof InventoryAdapter) {
             Lens lens = ((InventoryAdapter) container).getRootLens();
             if (lens != null) {
-                System.out.print("Adapter found\n");
                 return lens;
             }
             // else lens is null: Adapter is probably getting initialized
@@ -238,7 +234,6 @@ public final class ContainerUtil {
 
         // Container provides Lens?
         if (container instanceof LensProvider) {
-            System.out.print("LensProvider found\n");
             InventoryAdapter<IInventory, ItemStack> adapter;
             if (container instanceof InventoryAdapter) {
                 adapter = ((InventoryAdapter) container);
@@ -266,7 +261,6 @@ public final class ContainerUtil {
         for (Map.Entry<IInventory, List<Slot>> entry : viewed.entrySet()) {
             int slotCount = entry.getValue().size();
             Lens<IInventory, ItemStack> lens = null;
-            System.out.print(" - " + entry.getKey().getClass().getName() + " (" + slotCount + ")\t");
             if (entry.getKey() instanceof InventoryAdapter) { // Check if sub-inventory is Adapter
                 lens = ((InventoryAdapter) entry.getKey()).getRootLens();
             }
@@ -288,22 +282,18 @@ public final class ContainerUtil {
                     lens = new SlotLensImpl(index);
                 } else if (lens instanceof PlayerInventoryLens && slotCount == 36) { // Player
                     // Player Inventory + Hotbar
-                    System.out.print("Player GridLens (27) + HotbarLens (9)\n");
                     lenses.add(new GridInventoryLensImpl(index, 9, 3, 9, slots));
                     lenses.add(new HotbarLensImpl(index + 27, 9, slots));
                     lens = null;
-                } else { // Unknown
+                } else { // Unknown - fallback to OrderedInventory
                     lens = new OrderedInventoryLensImpl(index, slotCount, 1, slots);
                 }
             }
             if (lens != null) {
-                System.out.print(lens.getClass().getSimpleName() + " (" + lens.slotCount() + ")\n");
                 lenses.add(lens);
             }
             index += slotCount;
         }
-        System.out.print("#########################################################\n");
-
         // Lens containing/delegating to other lenses
         return new ContainerLens((InventoryAdapter<IInventory, ItemStack>) container, slots, lenses);
     }
