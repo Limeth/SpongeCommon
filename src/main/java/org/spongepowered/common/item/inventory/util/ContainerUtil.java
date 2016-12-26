@@ -245,7 +245,7 @@ public final class ContainerUtil {
             } else {
                 adapter = new Adapter(MinecraftFabric.of(container));
             }
-            return ((LensProvider) container).getRootLens(null, adapter); // TODO 1st param is null because we have a container and not IInventory
+            return ((LensProvider) container).getRootLens(fabric, adapter);
         }
 
         // For those Sheep-Crafting inventories
@@ -272,7 +272,8 @@ public final class ContainerUtil {
             }
             if (lens == null && entry.getKey() instanceof LensProvider) // Check if sub-inventory is LensProvider
             {
-                lens = ((LensProvider) entry.getKey()).getRootLens(entry.getKey(), new Adapter(MinecraftFabric.of(entry.getKey())));
+                Fabric<IInventory> keyFabric = MinecraftFabric.of(entry.getKey());
+                lens = ((LensProvider) entry.getKey()).getRootLens(keyFabric, new Adapter(keyFabric));
             }
             if (lens == null // Unknown Inventory or
                     || lens.slotCount() != slotCount) { // Inventory size <> Lens size
@@ -297,7 +298,6 @@ public final class ContainerUtil {
             }
             if (lens != null) {
                 System.out.print(lens.getClass().getSimpleName() + " (" + lens.slotCount() + ")\n");
-                //this.inventories.add(lens);
                 lenses.add(lens);
             }
             index += slotCount;

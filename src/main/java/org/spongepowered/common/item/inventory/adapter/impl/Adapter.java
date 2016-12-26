@@ -417,7 +417,7 @@ public class Adapter implements MinecraftInventoryAdapter {
 
     protected Lens<IInventory, net.minecraft.item.ItemStack> initRootLens() {
         if (this instanceof LensProvider) {
-            return ((LensProvider) this).getRootLens(this, this);
+            return ((LensProvider) this).getRootLens(this.inventory, this);
         }
         int size = this.inventory.getSize();
         if (size == 0) {

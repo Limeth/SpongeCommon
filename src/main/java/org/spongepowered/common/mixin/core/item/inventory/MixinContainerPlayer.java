@@ -29,6 +29,7 @@ import net.minecraft.inventory.IInventory;
 import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.common.item.inventory.adapter.InventoryAdapter;
+import org.spongepowered.common.item.inventory.lens.Fabric;
 import org.spongepowered.common.item.inventory.lens.Lens;
 import org.spongepowered.common.item.inventory.lens.LensProvider;
 import org.spongepowered.common.item.inventory.lens.impl.minecraft.container.ContainerPlayerInventoryLens;
@@ -37,7 +38,7 @@ import org.spongepowered.common.item.inventory.lens.impl.minecraft.container.Con
 public abstract class MixinContainerPlayer extends MixinContainer implements LensProvider<IInventory, ItemStack> {
 
     @Override
-    public Lens<IInventory, ItemStack> getRootLens(IInventory inv, InventoryAdapter<IInventory, ItemStack> adapter) {
+    public Lens<IInventory, ItemStack> getRootLens(Fabric<IInventory> fabric, InventoryAdapter<IInventory, ItemStack> adapter) {
         return new ContainerPlayerInventoryLens(adapter, inventory$getSlotProvider());
     }
 }
