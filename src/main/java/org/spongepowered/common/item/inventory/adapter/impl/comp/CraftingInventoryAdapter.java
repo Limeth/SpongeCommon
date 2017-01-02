@@ -29,7 +29,7 @@ import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
 import org.spongepowered.api.item.inventory.type.GridInventory;
-import org.spongepowered.api.item.recipe.Recipe;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.common.item.inventory.lens.Fabric;
 import org.spongepowered.common.item.inventory.lens.comp.CraftingInventoryLens;
 import org.spongepowered.common.item.inventory.util.RecipeUtil;
@@ -69,7 +69,7 @@ public class CraftingInventoryAdapter extends GridInventoryAdapter implements Cr
     }
 
     @Override
-    public Optional<Recipe> getRecipe() {
+    public Optional<CraftingRecipe> getRecipe() {
         return RecipeUtil.findMatchingRecipe(this.inventory, this.craftingLens.getCraftingGrid(), this.craftingLens.getOutputSlot());
     }
 
