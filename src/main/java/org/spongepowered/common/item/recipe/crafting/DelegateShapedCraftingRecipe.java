@@ -35,7 +35,6 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 public class DelegateShapedCraftingRecipe extends AbstractSpongeShapedCraftingRecipe {
 
@@ -93,7 +92,7 @@ public class DelegateShapedCraftingRecipe extends AbstractSpongeShapedCraftingRe
     }
 
     @Override
-    public Stream<Object> getRemainingItems(GridInventory grid, World world) {
+    public Optional<List<ItemStack>> getRemainingItems(GridInventory grid, World world) {
         return delegate.getRemainingItems(grid, world);
     }
 

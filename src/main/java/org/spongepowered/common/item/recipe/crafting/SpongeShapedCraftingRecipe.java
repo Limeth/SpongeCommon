@@ -26,19 +26,18 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.ImmutableMap;
-import net.minecraft.item.Item;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.world.World;
+import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.List;
 import java.util.Map;
 import java.util.Optional;
-import java.util.function.Function;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
@@ -168,30 +167,7 @@ public class SpongeShapedCraftingRecipe extends AbstractSpongeShapedCraftingReci
                 .map(Slot::peek)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .map((Function<ItemStack, Optional<ItemStack>>) itemStack -> {
-                    // TODO there is different behavior in SF and SV, what to do?
-                    // SF has ForgeHooks#getContainerItem
-                    // SV has Item#hasContainerItem and Item#getContainerItem
-                    // I think I could solve this by introducing a method
-                    // ItemStackUtil#getContainerItem(ItemStack)
-                    // which would be implemented differently in SV and SF,
-                    // but the ItemStackUtil only contains static methods?
-                    // Help.
-
-                    // Use the vanilla implementation for now
-                    net.minecraft.item.ItemStack nmsStack = ItemStackUtil.toNative(itemStack);
-                    Item nmsItem = nmsStack.getItem();
-
-                    if (nmsItem.hasContainerItem()) {
-                        Item nmsContainerItem = nmsItem.getContainerItem();
-                        net.minecraft.item.ItemStack nmsContainerStack = new net.minecraft.item.ItemStack(nmsContainerItem);
-                        ItemStack containerStack = ItemStackUtil.fromNative(nmsContainerStack);
-
-                        return Optional.of(containerStack);
-                    } else {
-                        return Optional.empty();
-                    }
-                })
+                .map(SpongeImplHooks::getContainerItem)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));

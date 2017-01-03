@@ -24,6 +24,7 @@
  */
 package org.spongepowered.common;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
@@ -33,6 +34,7 @@ import net.minecraft.entity.EnumCreatureType;
 import net.minecraft.entity.player.EntityPlayer;
 import net.minecraft.entity.player.EntityPlayerMP;
 import net.minecraft.init.Blocks;
+import net.minecraft.item.Item;
 import net.minecraft.tileentity.TileEntity;
 import net.minecraft.util.EnumFacing;
 import net.minecraft.util.ResourceLocation;
@@ -46,11 +48,15 @@ import net.minecraft.world.WorldProvider;
 import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.MapStorage;
+import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.common.event.tracking.ItemDropData;
+import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.Collection;
 import java.util.Iterator;
+import java.util.Optional;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -194,5 +200,25 @@ public final class SpongeImplHooks {
 
     public static MapStorage getWorldMapStorage(World world) {
         return world.getMapStorage();
+    }
+
+    // Crafting
+
+    @Nonnull
+    public static Optional<ItemStack> getContainerItem(@Nonnull ItemStack itemStack) {
+        Preconditions.checkNotNull(itemStack, "The itemStack must not be null");
+
+        net.minecraft.item.ItemStack nmsStack = ItemStackUtil.toNative(itemStack);
+        Item nmsItem = nmsStack.getItem();
+
+        if (nmsItem.hasContainerItem()) {
+            Item nmsContainerItem = nmsItem.getContainerItem();
+            net.minecraft.item.ItemStack nmsContainerStack = new net.minecraft.item.ItemStack(nmsContainerItem);
+            ItemStack containerStack = ItemStackUtil.fromNative(nmsContainerStack);
+
+            return Optional.of(containerStack);
+        } else {
+            return Optional.empty();
+        }
     }
 }
