@@ -34,7 +34,6 @@ import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.world.World;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
-import org.spongepowered.common.mixin.core.item.recipe.IMixinShapedRecipes;
 
 import java.util.List;
 import java.util.Map;
@@ -48,9 +47,6 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, List<String> aisle,
                                Map<Character, Predicate<ItemStackSnapshot>> ingredientPredicates) {
         super(width, height, new net.minecraft.item.ItemStack[0], ItemStackUtil.fromSnapshotToNative(result));
-
-        ((IMixinShapedRecipes) this).setAisle(aisle);
-        ((IMixinShapedRecipes) this).setIngredientPredicates(ingredientPredicates);
     }
 
     @Override
@@ -128,5 +124,25 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ItemStackSnapshot getExemplaryResult() {
+        return null;
+    }
+
+    @Override
+    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
+        return null;
+    }
+
+    @Override
+    public int getWidth() {
+        return 0;
+    }
+
+    @Override
+    public int getHeight() {
+        return 0;
     }
 }

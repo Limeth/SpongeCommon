@@ -24,9 +24,6 @@
  */
 package org.spongepowered.common.mixin.core.item.recipe;
 
-import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -36,15 +33,14 @@ import org.spongepowered.asm.mixin.Implements;
 import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
-import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 
 @Mixin(ShapedRecipes.class)
 @Implements(@Interface(iface = ShapedCraftingRecipe.class, prefix = "sponge$"))
-public abstract class MixinShapedRecipes implements IRecipe, IMixinShapedRecipes {
+public abstract class MixinShapedRecipes implements IRecipe {
 
     @Final
     @Shadow
@@ -54,44 +50,18 @@ public abstract class MixinShapedRecipes implements IRecipe, IMixinShapedRecipes
     @Shadow
     private int recipeHeight;
 
-    private List<String> aisle;
-    private Map<Character, Predicate<ItemStackSnapshot>> ingredientPredicates;
-
-    public List<String> sponge$getAisle() {
-        return aisle;
-    }
-
-    @Override
-    public void setAisle(List<String> aisle) {
-        Preconditions.checkArgument(aisle.size() == recipeHeight, "Invalid aisle height");
-
-        for(String row : aisle)
-            if(row.length() != recipeWidth)
-                throw new IllegalArgumentException("Invalid aisle width (inconsistent?)");
-
-        this.aisle = ImmutableList.copyOf(aisle);
-    }
-
-    public Map<Character, Predicate<ItemStackSnapshot>> sponge$getIngredientPredicates() {
-        return ingredientPredicates;
-    }
-
-    public Optional<Predicate<ItemStackSnapshot>> sponge$getIngredientPredicate(char symbol) {
-        return Optional.ofNullable(ingredientPredicates.get(symbol));
-    }
+    @Final
+    @Shadow
+    private net.minecraft.item.ItemStack[] recipeItems;
 
     public Optional<Predicate<ItemStackSnapshot>> sponge$getIngredientPredicate(int x, int y) {
-        if (x < 0 || x >= sponge$getWidth() || y < 0 || y >= sponge$getHeight())
+        if(x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight)
             return Optional.empty();
 
-        char symbol = sponge$getAisle().get(y).charAt(x);
+        int recipeItemIndex = x + y * recipeWidth;
+        ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(recipeItems[recipeItemIndex]);
 
-        return sponge$getIngredientPredicate(symbol);
-    }
-
-    @Override
-    public void setIngredientPredicates(Map<Character, Predicate<ItemStackSnapshot>> ingredientPredicates) {
-        this.ingredientPredicates = ImmutableMap.copyOf(ingredientPredicates);
+        return Optional.of(new MatchesVanillaItemStack(recipeSnapshot));
     }
 
     public int sponge$getWidth() {
