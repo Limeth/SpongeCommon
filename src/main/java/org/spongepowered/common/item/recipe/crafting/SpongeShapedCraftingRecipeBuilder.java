@@ -26,6 +26,7 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -77,21 +78,32 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         checkState(!this.ingredientMap.isEmpty(), "no ingredients set");
         checkState(this.result != null, "no result set");
 
-        net.minecraft.item.ItemStack stack = null;
+        ImmutableTable.Builder<Integer, Integer, Predicate<ItemStackSnapshot>> tableBuilder = ImmutableTable.builder();
         Iterator<String> aisleIterator = this.aisle.iterator();
-        int width = aisleIterator.next().length();
-        int height = 1;
+        String aisleRow = aisleIterator.next();
+        int width = aisleRow.length();
+        int height = 0;
 
         checkState(width > 0, "The aisle cannot be empty.");
 
-        while(aisleIterator.hasNext()) {
-            height++;
-
-            checkState(aisleIterator.next().length() == width,
+        do {
+            checkState(aisleRow.length() == width,
                     "The aisle has an inconsistent width.");
-        }
 
-        return new SpongeShapedCraftingRecipe(width, height, result, aisle, ingredientMap);
+            for (int x = 0; x < width; x++) {
+                char symbol = aisleRow.charAt(x);
+                Predicate<ItemStackSnapshot> ingredientPredicate = ingredientMap.get(symbol);
+
+                if (ingredientPredicate != null) {
+                    tableBuilder.put(x, height, ingredientPredicate);
+                }
+            }
+
+            height++;
+            aisleRow = aisleIterator.next();
+        } while(aisleIterator.hasNext());
+
+        return new SpongeShapedCraftingRecipe(width, height, result, tableBuilder.build());
     }
 
     @Override

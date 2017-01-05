@@ -24,6 +24,8 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
 import net.minecraft.item.crafting.ShapedRecipes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
@@ -36,7 +38,6 @@ import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
@@ -44,9 +45,12 @@ import java.util.stream.StreamSupport;
 
 public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedCraftingRecipe {
 
-    SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, List<String> aisle,
-                               Map<Character, Predicate<ItemStackSnapshot>> ingredientPredicates) {
+    private final Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients;
+
+    SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients) {
         super(width, height, new net.minecraft.item.ItemStack[0], ItemStackUtil.fromSnapshotToNative(result));
+
+        this.ingredients = ImmutableTable.copyOf(ingredients);
     }
 
     @Override
@@ -128,21 +132,21 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
 
     @Override
     public ItemStackSnapshot getExemplaryResult() {
-        return null;
+        return ItemStackUtil.snapshotOf(getRecipeOutput());
     }
 
     @Override
     public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
-        return null;
+        return Optional.ofNullable(ingredients.get(x, y));
     }
 
     @Override
     public int getWidth() {
-        return 0;
+        return recipeWidth;
     }
 
     @Override
     public int getHeight() {
-        return 0;
+        return recipeHeight;
     }
 }

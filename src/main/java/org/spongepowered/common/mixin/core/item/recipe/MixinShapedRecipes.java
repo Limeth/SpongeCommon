@@ -44,11 +44,11 @@ public abstract class MixinShapedRecipes implements IRecipe {
 
     @Final
     @Shadow
-    private int recipeWidth;
+    protected int recipeWidth;
 
     @Final
     @Shadow
-    private int recipeHeight;
+    protected int recipeHeight;
 
     @Final
     @Shadow
