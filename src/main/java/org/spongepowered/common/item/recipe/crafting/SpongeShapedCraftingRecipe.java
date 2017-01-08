@@ -24,66 +24,33 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
-import com.google.common.collect.ImmutableList;
-import com.google.common.collect.ImmutableMap;
+import com.google.common.collect.ImmutableTable;
+import com.google.common.collect.Table;
+import net.minecraft.item.crafting.ShapedRecipes;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.world.World;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.List;
-import java.util.Map;
 import java.util.Optional;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
-public class SpongeShapedCraftingRecipe extends AbstractSpongeShapedCraftingRecipe {
+public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedCraftingRecipe {
 
-    private final int width;
-    private final int height;
-    private final List<String> aisle;
-    private final Map<Character, Predicate<ItemStackSnapshot>> ingredientPredicates;
+    private final Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients;
 
-    SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, List<String> aisle,
-                               Map<Character, Predicate<ItemStackSnapshot>> ingredientPredicates) {
-        this.width = width;
-        this.height = height;
-        this.aisle = ImmutableList.copyOf(aisle);
-        this.ingredientPredicates = ImmutableMap.copyOf(ingredientPredicates);
-    }
+    SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients) {
+        super(width, height, new net.minecraft.item.ItemStack[0], ItemStackUtil.fromSnapshotToNative(result));
 
-    @Override
-    public ItemStackSnapshot getExemplaryResult() {
-        return ItemStackUtil.snapshotOf(getRecipeOutput());
-    }
-
-    @Override
-    public List<String> getAisle() {
-        return aisle;
-    }
-
-    @Override
-    public Map<Character, Predicate<ItemStackSnapshot>> getIngredientPredicates() {
-        return ingredientPredicates;
-    }
-
-    @Override
-    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(char symbol) {
-        return Optional.ofNullable(getIngredientPredicates().get(symbol));
-    }
-
-    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
-        if (x < 0 || x >= getWidth() || y < 0 || y >= getHeight())
-            return Optional.empty();
-
-        char symbol = getAisle().get(y).charAt(x);
-
-        return getIngredientPredicate(symbol);
+        this.ingredients = ImmutableTable.copyOf(ingredients);
     }
 
     @Override
@@ -141,16 +108,6 @@ public class SpongeShapedCraftingRecipe extends AbstractSpongeShapedCraftingReci
     }
 
     @Override
-    public int getWidth() {
-        return width;
-    }
-
-    @Override
-    public int getHeight() {
-        return height;
-    }
-
-    @Override
     public Optional<ItemStack> getResult(GridInventory grid, World world) {
         if(!isValid(grid, world))
             return Optional.empty();
@@ -171,5 +128,25 @@ public class SpongeShapedCraftingRecipe extends AbstractSpongeShapedCraftingReci
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .collect(Collectors.toList()));
+    }
+
+    @Override
+    public ItemStackSnapshot getExemplaryResult() {
+        return ItemStackUtil.snapshotOf(getRecipeOutput());
+    }
+
+    @Override
+    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
+        return Optional.ofNullable(ingredients.get(x, y));
+    }
+
+    @Override
+    public int getWidth() {
+        return recipeWidth;
+    }
+
+    @Override
+    public int getHeight() {
+        return recipeHeight;
     }
 }

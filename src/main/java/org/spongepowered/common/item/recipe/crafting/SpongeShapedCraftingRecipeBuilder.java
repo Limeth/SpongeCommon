@@ -26,20 +26,17 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.crafting.ShapedRecipes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
-import org.spongepowered.common.item.inventory.util.ItemStackUtil;
+import org.spongepowered.common.mixin.core.item.recipe.MatchesVanillaItemStack;
 
-import java.util.Arrays;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Spliterators;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
@@ -48,7 +45,7 @@ import javax.annotation.Nullable;
 public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRecipe.Builder {
 
     private final List<String> aisle = Lists.newArrayList();
-    private Map<Character, Predicate<ItemStackSnapshot>> ingredientMap = Maps.newHashMap();
+    private final Map<Character, Predicate<ItemStackSnapshot>> ingredientMap = Maps.newHashMap();
     private ItemStackSnapshot result;
 
     @Nonnull
@@ -80,7 +77,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
     @Nonnull
     @Override
     public ShapedCraftingRecipe.Builder where(char symbol, @Nullable ItemStackSnapshot ingredient) throws IllegalArgumentException {
-        return where(symbol, ingredient == null ? null : (ItemStackSnapshot iss) -> match(ingredient, iss));
+        return where(symbol, ingredient != null ? new MatchesVanillaItemStack(ingredient) : null);
     }
 
     @Nonnull
@@ -97,29 +94,54 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         checkState(!this.ingredientMap.isEmpty(), "no ingredients set");
         checkState(this.result != null, "no result set");
 
-        net.minecraft.item.ItemStack stack = null;
+        ImmutableTable.Builder<Integer, Integer, Predicate<ItemStackSnapshot>> tableBuilder = ImmutableTable.builder();
         Iterator<String> aisleIterator = this.aisle.iterator();
-        int width = aisleIterator.next().length();
-        int height = 1;
+        String aisleRow = aisleIterator.next();
+        int width = aisleRow.length();
+        int height = 0;
 
         checkState(width > 0, "The aisle cannot be empty.");
 
-        while(aisleIterator.hasNext()) {
-            height++;
-
-            checkState(aisleIterator.next().length() == width,
+        do {
+            checkState(aisleRow.length() == width,
                     "The aisle has an inconsistent width.");
-        }
 
-        return new SpongeShapedCraftingRecipe(width, height, result, aisle, ingredientMap);
+            for (int x = 0; x < width; x++) {
+                char symbol = aisleRow.charAt(x);
+                Predicate<ItemStackSnapshot> ingredientPredicate = ingredientMap.get(symbol);
+
+                if (ingredientPredicate != null) {
+                    tableBuilder.put(x, height, ingredientPredicate);
+                }
+            }
+
+            height++;
+            aisleRow = aisleIterator.next();
+        } while(aisleIterator.hasNext());
+
+        return new SpongeShapedCraftingRecipe(width, height, result, tableBuilder.build());
     }
 
     @Nonnull
     @Override
     public ShapedCraftingRecipe.Builder from(@Nullable ShapedCraftingRecipe value) {
         this.aisle.clear();
-        this.aisle.addAll(value.getAisle());
-        this.ingredientMap = Maps.newHashMap(value.getIngredientPredicates());
+        this.ingredientMap.clear();
+
+        for (int y = 0; y < value.getHeight(); y++) {
+            String row = "";
+
+            for (int x = 0; x < value.getWidth(); x++) {
+                char symbol = (char) ('a' + x + y * value.getWidth());
+                row += symbol;
+
+                value.getIngredientPredicate(x, y)
+                        .ifPresent(predicate -> ingredientMap.put(symbol, predicate));
+            }
+
+            this.aisle.add(row);
+        }
+
         this.result = value.getExemplaryResult();
         return this;
     }
@@ -131,39 +153,6 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         this.ingredientMap.clear();
         this.result = null;
         return this;
-    }
-
-    /**
-     * Mimic the vanilla matching behavior,
-     * taken from {@link ShapedRecipes#checkMatch(InventoryCrafting, int, int, boolean)}
-     *
-     * @param recipeStack The stack required by the recipe
-     * @param inventoryStack The stack found in the inventory
-     * @return Whether the stacks match according to the vanilla Minecraft behavior
-     */
-    public static boolean match(ItemStackSnapshot recipeStack, ItemStackSnapshot inventoryStack) {
-        net.minecraft.item.ItemStack recipeNMS = ItemStackUtil.fromSnapshotToNative(recipeStack);
-        net.minecraft.item.ItemStack inventoryNMS = ItemStackUtil.fromSnapshotToNative(inventoryStack);
-
-        if (!recipeNMS.isEmpty() || !inventoryNMS.isEmpty())
-        {
-            if (recipeNMS.isEmpty() != inventoryNMS.isEmpty())
-            {
-                return false;
-            }
-
-            if (recipeNMS.getItem() != inventoryNMS.getItem())
-            {
-                return false;
-            }
-
-            if (recipeNMS.getMetadata() != 32767 && recipeNMS.getMetadata() != inventoryNMS.getMetadata())
-            {
-                return false;
-            }
-        }
-
-        return true;
     }
 
 }

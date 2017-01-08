@@ -22,46 +22,54 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.item.recipe.crafting;
+package org.spongepowered.common.mixin.core.item.recipe;
 
-import net.minecraft.inventory.InventoryCrafting;
-import net.minecraft.item.ItemStack;
+import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.item.crafting.ShapedRecipes;
-import net.minecraft.util.NonNullList;
-import net.minecraft.world.World;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Implements;
+import org.spongepowered.asm.mixin.Interface;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
-/**
- * Delegates all NMS methods to the abstract methods
- */
-public abstract class AbstractSpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedCraftingRecipe {
-    public AbstractSpongeShapedCraftingRecipe() {
-        super(0, 0, new ItemStack[0], null);
+import java.util.Optional;
+import java.util.function.Predicate;
+
+@Mixin(ShapedRecipes.class)
+@Implements(@Interface(iface = ShapedCraftingRecipe.class, prefix = "sponge$"))
+public abstract class MixinShapedRecipes implements IRecipe {
+
+    @Final
+    @Shadow
+    protected int recipeWidth;
+
+    @Final
+    @Shadow
+    protected int recipeHeight;
+
+    @Final
+    @Shadow
+    private net.minecraft.item.ItemStack[] recipeItems;
+
+    public Optional<Predicate<ItemStackSnapshot>> sponge$getIngredientPredicate(int x, int y) {
+        if(x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight)
+            return Optional.empty();
+
+        int recipeItemIndex = x + y * recipeWidth;
+        ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(recipeItems[recipeItemIndex]);
+
+        return Optional.of(new MatchesVanillaItemStack(recipeSnapshot));
     }
 
-    @Override
-    public int getRecipeSize() {
-        return ShapedCraftingRecipe.super.getRecipeSize();
+    public int sponge$getWidth() {
+        return recipeWidth;
     }
 
-    @Override
-    public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
-        // TODO how do I convert InventoryCrafting to GridInventory and vice versa?
+    public int sponge$getHeight() {
+        return recipeHeight;
     }
 
-    @Override
-    public boolean matches(InventoryCrafting inv, World worldIn) {
-        // TODO how do I convert InventoryCrafting to GridInventory and vice versa?
-    }
-
-    @Override
-    public ItemStack getCraftingResult(InventoryCrafting inv) {
-        // TODO how do I convert InventoryCrafting to GridInventory and vice versa?
-    }
-
-    @Override
-    public ItemStack getRecipeOutput() {
-        return ItemStackUtil.fromSnapshotToNative(getExemplaryResult());
-    }
 }
