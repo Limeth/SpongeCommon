@@ -32,6 +32,7 @@ import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.world.World;
 import org.spongepowered.common.SpongeImplHooks;
@@ -108,26 +109,22 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     }
 
     @Override
-    public Optional<ItemStack> getResult(GridInventory grid, World world) {
+    public Optional<CraftingResult> getResult(GridInventory grid, World world) {
         if(!isValid(grid, world))
             return Optional.empty();
 
-        return Optional.of(getExemplaryResult().createStack());
-    }
-
-    @Override
-    public Optional<List<ItemStack>> getRemainingItems(GridInventory grid, World world) {
-        if(!isValid(grid, world))
-            return Optional.empty();
-
-        return Optional.of(StreamSupport.stream(grid.<Slot>slots().spliterator(), false)
+        ItemStackSnapshot mainItem = getExemplaryResult();
+        List<ItemStackSnapshot> remainingItems = StreamSupport.stream(grid.<Slot>slots().spliterator(), false)
                 .map(Slot::peek)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
                 .map(SpongeImplHooks::getContainerItem)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
-                .collect(Collectors.toList()));
+                .map(ItemStack::createSnapshot)
+                .collect(Collectors.toList());
+
+        return Optional.of(new SpongeCraftingResult(mainItem, remainingItems));
     }
 
     @Override
