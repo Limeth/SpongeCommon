@@ -42,39 +42,55 @@ import java.util.Map;
 import java.util.Spliterators;
 import java.util.function.Predicate;
 
+import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRecipe.Builder {
 
     private final List<String> aisle = Lists.newArrayList();
     private Map<Character, Predicate<ItemStackSnapshot>> ingredientMap = Maps.newHashMap();
-    @Nullable private ItemStackSnapshot result;
+    private ItemStackSnapshot result;
 
+    @Nonnull
     @Override
-    public ShapedCraftingRecipe.Builder aisle(String... aisle) {
+    public ShapedCraftingRecipe.Builder aisle(@Nullable String... aisle) {
         this.aisle.clear();
-        Collections.addAll(this.aisle, aisle);
+
+        if (aisle != null) {
+            Collections.addAll(this.aisle, aisle);
+        }
+
         return this;
     }
 
+    @Nonnull
     @Override
     public ShapedCraftingRecipe.Builder where(char symbol, @Nullable Predicate<ItemStackSnapshot> ingredient) throws IllegalArgumentException {
         checkState(!this.aisle.isEmpty(), "aisle must be set before setting aisle symbols");
-        this.ingredientMap.put(symbol, ingredient);
+
+        if (ingredient != null) {
+            ingredientMap.put(symbol, ingredient);
+        } else {
+            ingredientMap.remove(symbol);
+        }
+
         return this;
     }
 
+    @Nonnull
     @Override
     public ShapedCraftingRecipe.Builder where(char symbol, @Nullable ItemStackSnapshot ingredient) throws IllegalArgumentException {
-        return where(symbol, (ItemStackSnapshot iss) -> match(ingredient, iss));
+        return where(symbol, ingredient == null ? null : (ItemStackSnapshot iss) -> match(ingredient, iss));
     }
 
+    @Nonnull
     @Override
-    public ShapedCraftingRecipe.Builder result(ItemStackSnapshot result) {
+    public ShapedCraftingRecipe.Builder result(@Nullable ItemStackSnapshot result) {
         this.result = result;
         return this;
     }
 
+    @Nonnull
     @Override
     public ShapedCraftingRecipe build() {
         checkState(!this.aisle.isEmpty(), "aisle has not been set");
@@ -98,8 +114,9 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         return new SpongeShapedCraftingRecipe(width, height, result, aisle, ingredientMap);
     }
 
+    @Nonnull
     @Override
-    public ShapedCraftingRecipe.Builder from(ShapedCraftingRecipe value) {
+    public ShapedCraftingRecipe.Builder from(@Nullable ShapedCraftingRecipe value) {
         this.aisle.clear();
         this.aisle.addAll(value.getAisle());
         this.ingredientMap = Maps.newHashMap(value.getIngredientPredicates());
@@ -107,6 +124,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         return this;
     }
 
+    @Nonnull
     @Override
     public ShapedCraftingRecipe.Builder reset() {
         this.aisle.clear();
