@@ -24,8 +24,6 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
-import static com.google.common.base.Preconditions.checkState;
-
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -33,14 +31,15 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.common.mixin.core.item.recipe.MatchesVanillaItemStack;
 
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkState;
 
 public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRecipe.Builder {
 
@@ -128,21 +127,26 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         this.aisle.clear();
         this.ingredientMap.clear();
 
-        for (int y = 0; y < value.getHeight(); y++) {
-            String row = "";
+        if (value != null) {
+            for (int y = 0; y < value.getHeight(); y++) {
+                String row = "";
 
-            for (int x = 0; x < value.getWidth(); x++) {
-                char symbol = (char) ('a' + x + y * value.getWidth());
-                row += symbol;
+                for (int x = 0; x < value.getWidth(); x++) {
+                    char symbol = (char) ('a' + x + y * value.getWidth());
+                    row += symbol;
 
-                value.getIngredientPredicate(x, y)
-                        .ifPresent(predicate -> ingredientMap.put(symbol, predicate));
+                    value.getIngredientPredicate(x, y)
+                            .ifPresent(predicate -> ingredientMap.put(symbol, predicate));
+                }
+
+                this.aisle.add(row);
             }
 
-            this.aisle.add(row);
+            this.result = value.getExemplaryResult();
+        } else {
+            this.result = null;
         }
 
-        this.result = value.getExemplaryResult();
         return this;
     }
 
