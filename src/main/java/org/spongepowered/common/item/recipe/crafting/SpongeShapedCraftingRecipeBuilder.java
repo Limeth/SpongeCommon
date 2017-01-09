@@ -29,7 +29,6 @@ import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
-import org.spongepowered.common.mixin.core.item.recipe.MatchesVanillaItemStack;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;

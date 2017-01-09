@@ -22,35 +22,39 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.core.item.recipe;
+package org.spongepowered.common.mixin.core.item.recipe.crafting;
 
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
-import org.spongepowered.api.item.recipe.RecipeRegistry;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
-import org.spongepowered.asm.mixin.*;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
+import org.spongepowered.asm.mixin.Final;
+import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
 @Mixin(CraftingManager.class)
-@Implements(@Interface(iface = RecipeRegistry.class, prefix = "sponge$"))
-public abstract class MixinCraftingManager {
+public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
 
     @Shadow
     @Final
     private List<IRecipe> recipes;
 
-    public void sponge$register(CraftingRecipe recipe) {
+    @Override
+    public void register(CraftingRecipe recipe) {
         spongeRecipes().add(recipe);
     }
 
-    public void sponge$remove(CraftingRecipe recipe) {
+    @Override
+    public void remove(CraftingRecipe recipe) {
         spongeRecipes().remove(recipe);
     }
 
-    public Collection<CraftingRecipe> sponge$getRecipes() {
+    @Override
+    public Collection<CraftingRecipe> getRecipes() {
         return Collections.unmodifiableList(spongeRecipes());
     }
 

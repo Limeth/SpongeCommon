@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.core.item.recipe;
+package org.spongepowered.common.item.recipe.crafting;
 
 import com.google.common.base.Preconditions;
 import net.minecraft.inventory.InventoryCrafting;

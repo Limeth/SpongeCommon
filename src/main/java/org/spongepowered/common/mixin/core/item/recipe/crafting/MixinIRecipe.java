@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.core.item.recipe;
+package org.spongepowered.common.mixin.core.item.recipe.crafting;
 
 import static org.spongepowered.common.item.recipe.crafting.TemporaryUtilClass.toNativeInventory;
 
