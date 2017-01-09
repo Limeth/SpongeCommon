@@ -1,5 +1,5 @@
 /*
- * This file is part of SpongeAPI, licensed under the MIT License (MIT).
+ * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
  * Copyright (c) contributors
@@ -24,10 +24,11 @@
  */
 package org.spongepowered.common.mixin.core.item.recipe;
 
+import static org.spongepowered.common.item.recipe.crafting.TemporaryUtilClass.toNativeInventory;
+
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.crafting.IRecipe;
 import net.minecraft.util.NonNullList;
-import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
@@ -37,10 +38,9 @@ import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
-import sun.reflect.generics.reflectiveObjects.NotImplementedException;
 
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
 @Mixin(IRecipe.class)
 @Implements(@Interface(iface = CraftingRecipe.class, prefix = "sponge$"))
@@ -50,22 +50,21 @@ public interface MixinIRecipe {
         return ItemStackUtil.snapshotOf(getRecipeOutput());
     }
 
-    default boolean sponge$isValid(GridInventory grid, World world) {
-        // TODO convert inventories
-        throw new NotImplementedException();
+    default boolean sponge$isValid(GridInventory inv, World world) {
+        return matches(toNativeInventory(inv), (net.minecraft.world.World) world);
     }
 
-    default Optional<ItemStack> sponge$getResult(GridInventory grid, World world) {
-        // TODO convert inventories
-        throw new NotImplementedException();
+    default ItemStackSnapshot sponge$getResult(GridInventory inv) {
+        return ItemStackUtil.snapshotOf(getCraftingResult(toNativeInventory(inv)));
     }
 
-    default Optional<List<ItemStack>> sponge$getRemainingItems(GridInventory grid, World world) {
-        // TODO convert inventories
-        throw new NotImplementedException();
+    default List<ItemStackSnapshot> sponge$getRemainingItems(GridInventory inv) {
+        return getRemainingItems(toNativeInventory(inv)).stream()
+                .map(ItemStackUtil::snapshotOf)
+                .collect(Collectors.toList());
     }
 
-    default int sponge$getRecipeSize() {
+    default int sponge$getSize() {
         return getRecipeSize();
     }
 

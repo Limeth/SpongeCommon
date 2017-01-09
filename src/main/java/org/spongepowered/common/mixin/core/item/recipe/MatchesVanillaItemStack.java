@@ -1,5 +1,5 @@
 /*
- * This file is part of SpongeAPI, licensed under the MIT License (MIT).
+ * This file is part of Sponge, licensed under the MIT License (MIT).
  *
  * Copyright (c) SpongePowered <https://www.spongepowered.org>
  * Copyright (c) contributors
@@ -32,6 +32,9 @@ import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
 import java.util.function.Predicate;
 
+/**
+ * Needs to be a separate class so it can be used in mixed-in code
+ */
 public class MatchesVanillaItemStack implements Predicate<ItemStackSnapshot> {
     private final ItemStackSnapshot itemStackSnapshot;
 
@@ -47,8 +50,8 @@ public class MatchesVanillaItemStack implements Predicate<ItemStackSnapshot> {
     }
 
     /**
-     * Mimic the vanilla matching behavior,taken from
-     {@link ShapedRecipes#checkMatch(InventoryCrafting, int, int, boolean)}
+     * Mimic the vanilla matching behavior, taken from
+     * {@link ShapedRecipes#checkMatch(InventoryCrafting, int, int, boolean)}
      *
      * @param recipeStack The stack required by the recipe
      * @param inventoryStack The stack found in the inventory

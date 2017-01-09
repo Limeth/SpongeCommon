@@ -24,15 +24,13 @@
  */
 package org.spongepowered.common.registry;
 
-import static com.google.common.base.Preconditions.checkArgument;
-import static com.google.common.base.Preconditions.checkNotNull;
-
 import com.google.common.collect.ImmutableList;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Singleton;
 import net.minecraft.block.Block;
 import net.minecraft.entity.EntityList;
 import net.minecraft.item.Item;
+import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.stats.StatList;
 import net.minecraft.util.ResourceLocation;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializers;
@@ -47,22 +45,15 @@ import org.spongepowered.api.entity.living.Agent;
 import org.spongepowered.api.item.ItemType;
 import org.spongepowered.api.item.merchant.VillagerRegistry;
 import org.spongepowered.api.item.recipe.RecipeRegistry;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import org.spongepowered.api.network.status.Favicon;
-import org.spongepowered.api.registry.AdditionalCatalogRegistryModule;
-import org.spongepowered.api.registry.CatalogRegistryModule;
-import org.spongepowered.api.registry.ExtraClassCatalogRegistryModule;
-import org.spongepowered.api.registry.RegistrationPhase;
-import org.spongepowered.api.registry.RegistryModule;
-import org.spongepowered.api.registry.RegistryModuleAlreadyRegisteredException;
+import org.spongepowered.api.registry.*;
 import org.spongepowered.api.registry.util.PluginProvidedRegistryModule;
 import org.spongepowered.api.registry.util.RegistrationDependency;
 import org.spongepowered.api.resourcepack.ResourcePack;
 import org.spongepowered.api.scoreboard.displayslot.DisplaySlot;
-import org.spongepowered.api.statistic.BlockStatistic;
-import org.spongepowered.api.statistic.EntityStatistic;
-import org.spongepowered.api.statistic.ItemStatistic;
-import org.spongepowered.api.statistic.StatisticType;
-import org.spongepowered.api.statistic.StatisticTypes;
+import org.spongepowered.api.statistic.*;
 import org.spongepowered.api.text.format.TextColor;
 import org.spongepowered.api.text.serializer.TextSerializerFactory;
 import org.spongepowered.api.text.translation.Translation;
@@ -89,25 +80,18 @@ import org.spongepowered.common.util.graph.DirectedGraph;
 import org.spongepowered.common.util.graph.TopologicalOrder;
 import org.spongepowered.common.world.extent.SpongeExtentBufferFactory;
 
+import javax.annotation.Nullable;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.io.InputStream;
 import java.lang.reflect.Field;
 import java.net.URL;
 import java.nio.file.Path;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.HashSet;
-import java.util.IdentityHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.function.Supplier;
 
-import javax.annotation.Nullable;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
 
 @SuppressWarnings("deprecation")
 @Singleton
@@ -394,8 +378,14 @@ public class SpongeGameRegistry implements GameRegistry {
         return SpongeFavicon.load(image);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public RecipeRegistry getRecipeRegistry() {
+    public RecipeRegistry<CraftingRecipe> getCraftingRecipeRegistry() {
+        return (RecipeRegistry<CraftingRecipe>) CraftingManager.getInstance();
+    }
+
+    @Override
+    public RecipeRegistry<SmeltingRecipe> getSmeltingRecipeRegistry() {
         throw new UnsupportedOperationException(); // TODO
     }
 

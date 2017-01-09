@@ -26,13 +26,14 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.crafting.ShapedRecipes;
+import net.minecraft.util.NonNullList;
 import org.spongepowered.api.item.ItemTypes;
 import org.spongepowered.api.item.inventory.ItemStack;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.Slot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
-import org.spongepowered.api.item.recipe.crafting.CraftingResult;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.api.world.World;
 import org.spongepowered.common.SpongeImplHooks;
@@ -109,12 +110,13 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     }
 
     @Override
-    public Optional<CraftingResult> getResult(GridInventory grid, World world) {
-        if(!isValid(grid, world))
-            return Optional.empty();
+    public ItemStackSnapshot getResult(GridInventory grid) {
+        return getExemplaryResult();
+    }
 
-        ItemStackSnapshot mainItem = getExemplaryResult();
-        List<ItemStackSnapshot> remainingItems = StreamSupport.stream(grid.<Slot>slots().spliterator(), false)
+    @Override
+    public List<ItemStackSnapshot> getRemainingItems(GridInventory grid) {
+        return StreamSupport.stream(grid.<Slot>slots().spliterator(), false)
                 .map(Slot::peek)
                 .filter(Optional::isPresent)
                 .map(Optional::get)
@@ -123,8 +125,6 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
                 .map(Optional::get)
                 .map(ItemStack::createSnapshot)
                 .collect(Collectors.toList());
-
-        return Optional.of(new SpongeCraftingResult(mainItem, remainingItems));
     }
 
     @Override
@@ -146,4 +146,34 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     public int getHeight() {
         return recipeHeight;
     }
+
+    /*
+     * IRecipe
+     */
+
+    @Override
+    public boolean matches(InventoryCrafting inv, net.minecraft.world.World worldIn) {
+        return AbstractSpongeCraftingRecipe.matches(this::isValid, inv, worldIn);
+    }
+
+    @Override
+    public net.minecraft.item.ItemStack getCraftingResult(InventoryCrafting inv) {
+        return AbstractSpongeCraftingRecipe.getCraftingResult(this::getResult, inv);
+    }
+
+    @Override
+    public int getRecipeSize() {
+        return AbstractSpongeCraftingRecipe.getRecipeSize(this::getSize);
+    }
+
+    @Override
+    public net.minecraft.item.ItemStack getRecipeOutput() {
+        return AbstractSpongeCraftingRecipe.getRecipeOutput(this::getExemplaryResult);
+    }
+
+    @Override
+    public NonNullList<net.minecraft.item.ItemStack> getRemainingItems(InventoryCrafting inv) {
+        return AbstractSpongeCraftingRecipe.getRemainingItems(this::getRemainingItems, inv);
+    }
+
 }

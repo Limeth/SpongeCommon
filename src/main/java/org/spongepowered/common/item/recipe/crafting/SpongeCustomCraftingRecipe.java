@@ -25,32 +25,49 @@
 package org.spongepowered.common.item.recipe.crafting;
 
 import com.google.common.base.Preconditions;
-import com.google.common.collect.ImmutableList;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.recipe.crafting.CraftingResult;
+import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import org.spongepowered.api.world.World;
 
 import java.util.List;
 
-public class SpongeCraftingResult implements CraftingResult {
+/**
+ * This is a wrapper class for custom-implemented {@link CraftingRecipe}s.
+ */
+public class SpongeCustomCraftingRecipe extends AbstractSpongeCraftingRecipe {
 
-    private final ItemStackSnapshot mainItem;
-    private final List<ItemStackSnapshot> remainingItems;
+    private final CraftingRecipe delegate;
 
-    public SpongeCraftingResult(ItemStackSnapshot mainItem, List<ItemStackSnapshot> remainingItems) {
-        Preconditions.checkNotNull(mainItem);
+    public SpongeCustomCraftingRecipe(CraftingRecipe delegate) {
+        Preconditions.checkNotNull(delegate, "The delegate must not be null.");
 
-        this.mainItem = mainItem;
-        this.remainingItems = remainingItems == null ? ImmutableList.of() : ImmutableList.copyOf(remainingItems);
+        this.delegate = delegate;
     }
 
     @Override
-    public ItemStackSnapshot getMainItem() {
-        return mainItem;
+    public ItemStackSnapshot getExemplaryResult() {
+        return delegate.getExemplaryResult();
     }
 
     @Override
-    public List<ItemStackSnapshot> getRemainingItems() {
-        return remainingItems;
+    public boolean isValid(GridInventory grid, World world) {
+        return delegate.isValid(grid, world);
+    }
+
+    @Override
+    public ItemStackSnapshot getResult(GridInventory grid) {
+        return delegate.getResult(grid);
+    }
+
+    @Override
+    public List<ItemStackSnapshot> getRemainingItems(GridInventory grid) {
+        return delegate.getRemainingItems(grid);
+    }
+
+    @Override
+    public int getSize() {
+        return delegate.getSize();
     }
 
 }
