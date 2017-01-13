@@ -24,19 +24,34 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
+import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
 import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.common.item.inventory.adapter.impl.comp.GridInventoryAdapter;
+import org.spongepowered.common.item.inventory.lens.Fabric;
+import org.spongepowered.common.item.inventory.lens.impl.comp.GridInventoryLensImpl;
+import org.spongepowered.common.item.inventory.lens.impl.fabric.DefaultInventoryFabric;
+
+import java.util.Iterator;
 
 public final class TemporaryUtilClass {
 
     public static GridInventory toSpongeInventory(InventoryCrafting inv) {
-        // TODO help?
-        return (GridInventory) inv;
+        DefaultInventoryFabric fabric = new DefaultInventoryFabric(inv);
+        GridInventoryLensImpl lens = new GridInventoryLensImpl(0, inv.getWidth(), inv.getHeight(), null);
+
+        return new GridInventoryAdapter(fabric, lens);
     }
 
     public static InventoryCrafting toNativeInventory(GridInventory inv) {
-        // TODO help?
-        return (InventoryCrafting) inv;
+        Fabric<IInventory> fabric = ((GridInventoryAdapter) inv).getInventory();
+        Iterator<IInventory> inventories = fabric.allInventories().iterator();
+        InventoryCrafting inventoryCrafting = (InventoryCrafting) inventories.next();
+
+        if(inventories.hasNext())
+            throw new IllegalStateException("Another inventory found: " + inventories.next());
+
+        return inventoryCrafting;
     }
 
 }
