@@ -346,6 +346,7 @@
         "item.recipe.crafting.MixinCraftingManager",
         "item.recipe.crafting.MixinIRecipe",
         "item.recipe.crafting.MixinShapedRecipes",
+        "item.recipe.crafting.MixinShapelessRecipes",
         "item.merchant.MixinMerchantRecipe",
         "nbt.MixinNBTTagCompound",
         "network.MixinNetHandlerPlayServer",
