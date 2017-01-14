@@ -33,8 +33,6 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.world.World;
-import org.spongepowered.asm.mixin.Implements;
-import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
@@ -43,28 +41,32 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Mixin(IRecipe.class)
-@Implements(@Interface(iface = CraftingRecipe.class, prefix = "sponge$"))
-public interface MixinIRecipe {
+public interface MixinIRecipe extends CraftingRecipe {
 
-    default ItemStackSnapshot sponge$getExemplaryResult() {
+    @Override
+    default ItemStackSnapshot getExemplaryResult() {
         return ItemStackUtil.snapshotOf(getRecipeOutput());
     }
 
-    default boolean sponge$isValid(GridInventory inv, World world) {
+    @Override
+    default boolean isValid(GridInventory inv, World world) {
         return matches(toNativeInventory(inv), (net.minecraft.world.World) world);
     }
 
-    default ItemStackSnapshot sponge$getResult(GridInventory inv) {
+    @Override
+    default ItemStackSnapshot getResult(GridInventory inv) {
         return ItemStackUtil.snapshotOf(getCraftingResult(toNativeInventory(inv)));
     }
 
-    default List<ItemStackSnapshot> sponge$getRemainingItems(GridInventory inv) {
+    @Override
+    default List<ItemStackSnapshot> getRemainingItems(GridInventory inv) {
         return getRemainingItems(toNativeInventory(inv)).stream()
                 .map(ItemStackUtil::snapshotOf)
                 .collect(Collectors.toList());
     }
 
-    default int sponge$getSize() {
+    @Override
+    default int getSize() {
         return getRecipeSize();
     }
 
