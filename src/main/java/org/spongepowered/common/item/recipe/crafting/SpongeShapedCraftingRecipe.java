@@ -149,12 +149,8 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     public List<ItemStackSnapshot> getRemainingItems(GridInventory grid) {
         return StreamSupport.stream(grid.<Slot>slots().spliterator(), false)
                 .map(Slot::peek)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(SpongeImplHooks::getContainerItem)
-                .filter(Optional::isPresent)
-                .map(Optional::get)
-                .map(ItemStack::createSnapshot)
+                .map(potentialItem -> potentialItem.flatMap(SpongeImplHooks::getContainerItem))
+                .map(potentialItem -> potentialItem.map(ItemStack::createSnapshot).orElse(ItemStackSnapshot.NONE))
                 .collect(Collectors.toList());
     }
 

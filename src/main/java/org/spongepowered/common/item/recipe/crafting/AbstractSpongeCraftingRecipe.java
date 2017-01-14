@@ -85,12 +85,19 @@ public abstract class AbstractSpongeCraftingRecipe implements CraftingRecipe, IR
     }
 
     public static NonNullList<ItemStack> getRemainingItems(Function<GridInventory, List<ItemStackSnapshot>> getRemainingItems, InventoryCrafting inv) {
-        NonNullList<ItemStack> result = NonNullList.create();
+        List<ItemStackSnapshot> spongeResult = getRemainingItems.apply(toSpongeInventory(inv));
 
-        getRemainingItems.apply(toSpongeInventory(inv))
-                .stream()
-                .map(ItemStackUtil::fromSnapshotToNative)
-                .forEach(result::add);
+        if (spongeResult.size() != inv.getSizeInventory()) {
+            throw new IllegalStateException("The number of ItemStackSnapshots returned by getRemainingItems must be equal to the size of the GridInventory.");
+        }
+
+        NonNullList<ItemStack> result = NonNullList.withSize(inv.getSizeInventory(), ItemStack.EMPTY);
+
+        for(int i = 0; i < spongeResult.size(); i++) {
+            ItemStack item = ItemStackUtil.fromSnapshotToNative(spongeResult.get(i));
+
+            result.set(i, item != null ? item : ItemStack.EMPTY);
+        }
 
         return result;
     }
