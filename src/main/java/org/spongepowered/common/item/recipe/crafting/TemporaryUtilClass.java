@@ -31,6 +31,7 @@ import org.spongepowered.common.item.inventory.adapter.impl.comp.GridInventoryAd
 import org.spongepowered.common.item.inventory.lens.Fabric;
 import org.spongepowered.common.item.inventory.lens.impl.comp.GridInventoryLensImpl;
 import org.spongepowered.common.item.inventory.lens.impl.fabric.DefaultInventoryFabric;
+import org.spongepowered.common.item.inventory.lens.impl.slots.SlotLensImpl;
 
 import java.util.Iterator;
 
@@ -38,7 +39,7 @@ public final class TemporaryUtilClass {
 
     public static GridInventory toSpongeInventory(InventoryCrafting inv) {
         DefaultInventoryFabric fabric = new DefaultInventoryFabric(inv);
-        GridInventoryLensImpl lens = new GridInventoryLensImpl(0, inv.getWidth(), inv.getHeight(), null);
+        GridInventoryLensImpl lens = new GridInventoryLensImpl(0, inv.getWidth(), inv.getHeight(), inv.getWidth(), SlotLensImpl::new);
 
         return new GridInventoryAdapter(fabric, lens);
     }

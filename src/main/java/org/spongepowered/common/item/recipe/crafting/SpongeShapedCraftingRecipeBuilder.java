@@ -24,21 +24,22 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
+import static com.google.common.base.Preconditions.checkState;
+
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 
-import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static com.google.common.base.Preconditions.checkState;
+import javax.annotation.Nonnull;
+import javax.annotation.Nullable;
 
 public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRecipe.Builder {
 
@@ -116,6 +117,8 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
             height++;
             aisleRow = aisleIterator.next();
         } while(aisleIterator.hasNext());
+
+        height++;
 
         return new SpongeShapedCraftingRecipe(width, height, result, tableBuilder.build());
     }
