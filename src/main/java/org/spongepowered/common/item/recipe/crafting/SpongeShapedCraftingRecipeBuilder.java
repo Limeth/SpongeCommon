@@ -37,6 +37,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
@@ -112,11 +113,10 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
 
             for (int x = 0; x < width; x++) {
                 char symbol = aisleRow.charAt(x);
-                Predicate<ItemStackSnapshot> ingredientPredicate = ingredientMap.get(symbol);
+                Predicate<ItemStackSnapshot> ingredientPredicate = Optional.ofNullable(ingredientMap.get(symbol))
+                        .orElseGet(() -> itemStackSnapshot -> itemStackSnapshot == ItemStackSnapshot.NONE);
 
-                if (ingredientPredicate != null) {
-                    tableBuilder.put(x, height, ingredientPredicate);
-                }
+                tableBuilder.put(x, height, ingredientPredicate);
             }
 
             height++;

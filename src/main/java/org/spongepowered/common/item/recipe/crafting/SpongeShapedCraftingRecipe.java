@@ -24,6 +24,7 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import net.minecraft.inventory.InventoryCrafting;
@@ -39,6 +40,7 @@ import org.spongepowered.api.world.World;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -50,8 +52,16 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     private final Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients;
     private final ItemStackSnapshot exemplaryResult;
 
-    SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients) {
+    public SpongeShapedCraftingRecipe(int width, int height, ItemStackSnapshot result, Table<Integer, Integer, Predicate<ItemStackSnapshot>> ingredients) {
         super(width, height, new net.minecraft.item.ItemStack[0], ItemStackUtil.fromSnapshotToNative(result));
+
+        Collection<Predicate<ItemStackSnapshot>> ingredientCollection = ingredients.values();
+
+        Preconditions.checkNotNull(result, "result");
+        Preconditions.checkArgument(ingredientCollection.size() == width * height,
+                "The ingredient table is missing some nodes, make sure it's filled!");
+        ingredientCollection.forEach(ingredient -> Preconditions.checkNotNull(ingredient,
+                "The ingredient table must not contain `null` values."));
 
         this.ingredients = ImmutableTable.copyOf(ingredients);
         this.exemplaryResult = result;
@@ -78,13 +88,12 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
                                 .orElseThrow(() -> new IllegalStateException("Could not access the slot," +
                                         " even though it was supposed to be in bounds."));
                         Optional<ItemStack> itemStackOptional = slot.peek();
-                        Optional<Predicate<ItemStackSnapshot>> ingredientPredicate = getIngredientPredicate(aisleX, aisleY);
+                        ItemStackSnapshot itemStackSnapshot = itemStackOptional.map(ItemStack::createSnapshot)
+                                .orElse(ItemStackSnapshot.NONE);
+                        Predicate<ItemStackSnapshot> ingredientPredicate = getIngredientPredicate(aisleX, aisleY)
+                                .orElseThrow(() -> new IllegalStateException("Could not access an ingredient predicate, even though all should be set."));
 
-                        if (itemStackOptional.isPresent() != ingredientPredicate.isPresent()) {
-                            continue byShiftingTheAisle;
-                        }
-
-                        if (ingredientPredicate.isPresent() && !ingredientPredicate.get().test(itemStackOptional.get().createSnapshot())) {
+                        if (!ingredientPredicate.test(itemStackSnapshot)) {
                             continue byShiftingTheAisle;
                         }
                     }
