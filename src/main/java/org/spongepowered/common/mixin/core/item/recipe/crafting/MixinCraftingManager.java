@@ -31,6 +31,7 @@ import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.common.SpongeImplHooks;
 
 import java.util.Collection;
 import java.util.Collections;
@@ -46,6 +47,7 @@ public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
     @Override
     public void register(CraftingRecipe recipe) {
         spongeRecipes().add(recipe);
+        SpongeImplHooks.onCraftingRecipeRegister(recipe);
     }
 
     @Override

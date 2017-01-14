@@ -49,6 +49,7 @@ import net.minecraft.world.WorldServer;
 import net.minecraft.world.chunk.Chunk;
 import net.minecraft.world.storage.MapStorage;
 import org.spongepowered.api.item.inventory.ItemStack;
+import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.common.event.tracking.ItemDropData;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 
@@ -220,5 +221,9 @@ public final class SpongeImplHooks {
         } else {
             return Optional.empty();
         }
+    }
+
+    public static void onCraftingRecipeRegister(CraftingRecipe recipe) {
+        // Overridden in SF
     }
 }
