@@ -46,6 +46,7 @@ import java.util.stream.Collectors;
 import java.util.stream.StreamSupport;
 
 public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements ShapelessCraftingRecipe {
+
     private final ItemStackSnapshot exemplaryResult;
     private final List<Predicate<ItemStackSnapshot>> ingredients;
 
@@ -82,6 +83,11 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
                 ItemStackSnapshot itemStackSnapshot = grid.getSlot(x, y)
                         .flatMap(Slot::peek).map(ItemStack::createSnapshot)
                         .orElse(ItemStackSnapshot.NONE);
+
+                if (itemStackSnapshot == ItemStackSnapshot.NONE) {
+                    continue byIncreasingTheSlotIndex;
+                }
+
                 Iterator<Predicate<ItemStackSnapshot>> iterator = ingredients.iterator();
 
                 while (iterator.hasNext()) {
@@ -89,10 +95,6 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
 
                     if (ingredient.test(itemStackSnapshot)) {
                         iterator.remove();
-
-                        if (ingredients.size() <= 0) {
-                            return true;
-                        }
 
                         continue byIncreasingTheSlotIndex;
                     }
@@ -150,4 +152,5 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
     public NonNullList<net.minecraft.item.ItemStack> getRemainingItems(InventoryCrafting inv) {
         return AbstractSpongeCraftingRecipe.getRemainingItems(this::getRemainingItems, inv);
     }
+
 }
