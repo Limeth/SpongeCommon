@@ -24,7 +24,9 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Table;
 import net.minecraft.inventory.InventoryCrafting;
@@ -57,10 +59,10 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
 
         Collection<Predicate<ItemStackSnapshot>> ingredientCollection = ingredients.values();
 
-        Preconditions.checkNotNull(result, "result");
-        Preconditions.checkArgument(ingredientCollection.size() == width * height,
+        checkNotNull(result, "result");
+        checkArgument(ingredientCollection.size() == width * height,
                 "The ingredient table is missing some nodes, make sure it's filled!");
-        ingredientCollection.forEach(ingredient -> Preconditions.checkNotNull(ingredient,
+        ingredientCollection.forEach(ingredient -> checkNotNull(ingredient,
                 "The ingredient table must not contain `null` values."));
 
         this.ingredients = ImmutableTable.copyOf(ingredients);
@@ -72,8 +74,9 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
         int gapWidth = grid.getColumns() - getWidth();
         int gapHeight = grid.getRows() - getHeight();
 
-        if(gapWidth < 0 || gapHeight < 0)
+        if (gapWidth < 0 || gapHeight < 0) {
             return false;
+        }
 
         // Shift the aisle along the grid wherever possible
         for (int offsetX = 0; offsetX <= gapWidth; offsetX++) {
@@ -161,22 +164,22 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
 
     @Override
     public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
-        return Optional.ofNullable(ingredients.get(x, y));
+        return Optional.ofNullable(this.ingredients.get(x, y));
     }
 
     @Override
     public int getWidth() {
-        return recipeWidth;
+        return this.recipeWidth;
     }
 
     @Override
     public int getHeight() {
-        return recipeHeight;
+        return this.recipeHeight;
     }
 
     @Override
     public int getSize() {
-        return recipeWidth * recipeHeight;
+        return this.recipeWidth * this.recipeHeight;
     }
 
     /*

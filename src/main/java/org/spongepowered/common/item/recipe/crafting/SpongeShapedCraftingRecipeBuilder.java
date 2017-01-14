@@ -67,9 +67,9 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         checkState(!this.aisle.isEmpty(), "aisle must be set before setting aisle symbols");
 
         if (ingredient != null) {
-            ingredientMap.put(symbol, ingredient);
+            this.ingredientMap.put(symbol, ingredient);
         } else {
-            ingredientMap.remove(symbol);
+            this.ingredientMap.remove(symbol);
         }
 
         return this;
@@ -113,7 +113,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
 
             for (int x = 0; x < width; x++) {
                 char symbol = aisleRow.charAt(x);
-                Predicate<ItemStackSnapshot> ingredientPredicate = Optional.ofNullable(ingredientMap.get(symbol))
+                Predicate<ItemStackSnapshot> ingredientPredicate = Optional.ofNullable(this.ingredientMap.get(symbol))
                         .orElseGet(() -> itemStackSnapshot -> itemStackSnapshot == ItemStackSnapshot.NONE);
 
                 tableBuilder.put(x, height, ingredientPredicate);
@@ -128,7 +128,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
             aisleRow = aisleIterator.next();
         } while(true);
 
-        return new SpongeShapedCraftingRecipe(width, height, result, tableBuilder.build());
+        return new SpongeShapedCraftingRecipe(width, height, this.result, tableBuilder.build());
     }
 
     @Nonnull
@@ -146,7 +146,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
                     row += symbol;
 
                     value.getIngredientPredicate(x, y)
-                            .ifPresent(predicate -> ingredientMap.put(symbol, predicate));
+                            .ifPresent(predicate -> this.ingredientMap.put(symbol, predicate));
                 }
 
                 this.aisle.add(row);

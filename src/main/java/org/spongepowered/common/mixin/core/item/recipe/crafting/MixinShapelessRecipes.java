@@ -42,9 +42,7 @@ import java.util.stream.Collectors;
 @Mixin(ShapelessRecipes.class)
 public abstract class MixinShapelessRecipes implements IRecipe, ShapelessCraftingRecipe {
 
-    @Shadow
-    @Final
-    private List<ItemStack> recipeItems;
+    @Shadow @Final private List<ItemStack> recipeItems;
 
     @Override
     public List<Predicate<ItemStackSnapshot>> getIngredientPredicates() {

@@ -41,9 +41,7 @@ import java.util.List;
 @Mixin(CraftingManager.class)
 public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
 
-    @Shadow
-    @Final
-    private List<IRecipe> recipes;
+    @Shadow @Final private List<IRecipe> recipes;
 
     @Override
     public void register(CraftingRecipe recipe) {

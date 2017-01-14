@@ -40,22 +40,15 @@ import java.util.function.Predicate;
 @Mixin(ShapedRecipes.class)
 public abstract class MixinShapedRecipes implements IRecipe, ShapedCraftingRecipe {
 
-    @Final
-    @Shadow
-    protected int recipeWidth;
-
-    @Final
-    @Shadow
-    protected int recipeHeight;
-
-    @Final
-    @Shadow
-    private net.minecraft.item.ItemStack[] recipeItems;
+    @Shadow @Final protected int recipeWidth;
+    @Shadow @Final protected int recipeHeight;
+    @Shadow @Final private net.minecraft.item.ItemStack[] recipeItems;
 
     @Override
     public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
-        if(x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight)
+        if (x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight) {
             return Optional.empty();
+        }
 
         int recipeItemIndex = x + y * recipeWidth;
         ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(recipeItems[recipeItemIndex]);
