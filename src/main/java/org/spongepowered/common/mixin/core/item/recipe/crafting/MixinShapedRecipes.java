@@ -29,8 +29,6 @@ import net.minecraft.item.crafting.ShapedRecipes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapedCraftingRecipe;
 import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Implements;
-import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
@@ -40,8 +38,7 @@ import java.util.Optional;
 import java.util.function.Predicate;
 
 @Mixin(ShapedRecipes.class)
-@Implements(@Interface(iface = ShapedCraftingRecipe.class, prefix = "sponge$"))
-public abstract class MixinShapedRecipes implements IRecipe {
+public abstract class MixinShapedRecipes implements IRecipe, ShapedCraftingRecipe {
 
     @Final
     @Shadow
@@ -55,7 +52,8 @@ public abstract class MixinShapedRecipes implements IRecipe {
     @Shadow
     private net.minecraft.item.ItemStack[] recipeItems;
 
-    public Optional<Predicate<ItemStackSnapshot>> sponge$getIngredientPredicate(int x, int y) {
+    @Override
+    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
         if(x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight)
             return Optional.empty();
 
@@ -65,11 +63,13 @@ public abstract class MixinShapedRecipes implements IRecipe {
         return Optional.of(new MatchesVanillaItemStack(recipeSnapshot));
     }
 
-    public int sponge$getWidth() {
+    @Override
+    public int getWidth() {
         return recipeWidth;
     }
 
-    public int sponge$getHeight() {
+    @Override
+    public int getHeight() {
         return recipeHeight;
     }
 
