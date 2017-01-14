@@ -71,9 +71,7 @@ public class GridInventoryLensImpl extends Inventory2DLensImpl implements GridIn
 
     @Override
     protected void init(SlotProvider<IInventory, ItemStack> slots) {
-        super.init(slots);
-        // The above `init` call registers spanningChildren, which would interfere
-        spanningChildren.clear();
+        super.init(slots, false);
 
         this.rows = new ArrayList<>();
         this.cols = new ArrayList<>();
