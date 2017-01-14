@@ -26,6 +26,7 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import static com.google.common.base.Preconditions.checkState;
 
+import com.google.common.base.Preconditions;
 import com.google.common.collect.ImmutableTable;
 import com.google.common.collect.Lists;
 import com.google.common.collect.Maps;
@@ -45,7 +46,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
 
     private final List<String> aisle = Lists.newArrayList();
     private final Map<Character, Predicate<ItemStackSnapshot>> ingredientMap = Maps.newHashMap();
-    private ItemStackSnapshot result;
+    private ItemStackSnapshot result = ItemStackSnapshot.NONE;
 
     @Nonnull
     @Override
@@ -73,16 +74,20 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
         return this;
     }
 
+    @SuppressWarnings("ConstantConditions")
     @Nonnull
     @Override
-    public ShapedCraftingRecipe.Builder where(char symbol, @Nullable ItemStackSnapshot ingredient) throws IllegalArgumentException {
-        return where(symbol, ingredient != null ? new MatchesVanillaItemStack(ingredient) : null);
+    public ShapedCraftingRecipe.Builder where(char symbol, @Nonnull ItemStackSnapshot ingredient) throws IllegalArgumentException {
+        return where(symbol, ingredient != ItemStackSnapshot.NONE ? new MatchesVanillaItemStack(ingredient) : null);
     }
 
     @Nonnull
     @Override
-    public ShapedCraftingRecipe.Builder result(@Nullable ItemStackSnapshot result) {
+    public ShapedCraftingRecipe.Builder result(@Nonnull ItemStackSnapshot result) {
+        Preconditions.checkNotNull(result, "result");
+
         this.result = result;
+
         return this;
     }
 
@@ -91,7 +96,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
     public ShapedCraftingRecipe build() {
         checkState(!this.aisle.isEmpty(), "aisle has not been set");
         checkState(!this.ingredientMap.isEmpty(), "no ingredients set");
-        checkState(this.result != null, "no result set");
+        checkState(this.result != ItemStackSnapshot.NONE, "no result set");
 
         ImmutableTable.Builder<Integer, Integer, Predicate<ItemStackSnapshot>> tableBuilder = ImmutableTable.builder();
         Iterator<String> aisleIterator = this.aisle.iterator();
@@ -157,7 +162,8 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
     public ShapedCraftingRecipe.Builder reset() {
         this.aisle.clear();
         this.ingredientMap.clear();
-        this.result = null;
+        this.result = ItemStackSnapshot.NONE;
+
         return this;
     }
 
