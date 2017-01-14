@@ -53,6 +53,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
     @Override
     public ShapedCraftingRecipe.Builder aisle(@Nullable String... aisle) {
         this.aisle.clear();
+        ingredientMap.clear();
 
         if (aisle != null) {
             Collections.addAll(this.aisle, aisle);
@@ -78,8 +79,9 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
     @SuppressWarnings("ConstantConditions")
     @Nonnull
     @Override
-    public ShapedCraftingRecipe.Builder where(char symbol, @Nonnull ItemStackSnapshot ingredient) throws IllegalArgumentException {
-        return where(symbol, ingredient != ItemStackSnapshot.NONE ? new MatchesVanillaItemStack(ingredient) : null);
+    public ShapedCraftingRecipe.Builder where(char symbol, @Nullable ItemStackSnapshot ingredient) throws IllegalArgumentException {
+        return where(symbol, ingredient != null && ingredient != ItemStackSnapshot.NONE
+                ? new MatchesVanillaItemStack(ingredient) : null);
     }
 
     @Nonnull

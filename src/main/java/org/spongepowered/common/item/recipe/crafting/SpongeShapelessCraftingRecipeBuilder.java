@@ -24,6 +24,9 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
@@ -33,7 +36,6 @@ import java.util.List;
 import java.util.function.Predicate;
 
 import javax.annotation.Nonnull;
-import javax.annotation.Nullable;
 
 public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRecipe.Builder {
 
@@ -66,9 +68,29 @@ public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRe
 
     @Nonnull
     @Override
-    public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nullable Predicate<ItemStackSnapshot> ingredient) {
-        Preconditions.checkNotNull(ingredient, "ingredient");
+    public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nonnull Predicate<ItemStackSnapshot> ingredient) {
+        checkNotNull(ingredient, "ingredient");
         this.ingredients.add(ingredient);
+
+        return this;
+    }
+
+    @Nonnull
+    @Override
+    public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nonnull ItemStackSnapshot ingredient) {
+        checkNotNull(ingredient, "ingredient");
+
+        return addIngredientPredicate(new MatchesVanillaItemStack(ingredient));
+    }
+
+    @SuppressWarnings("ConstantConditions")
+    @Nonnull
+    @Override
+    public ShapelessCraftingRecipe.Builder result(@Nonnull ItemStackSnapshot result) {
+        checkNotNull(result, "result");
+        checkArgument(result != ItemStackSnapshot.NONE, "The result must not be `ItemStackSnapshot.NONE`.");
+
+        this.exemplaryResult = result;
 
         return this;
     }
@@ -76,23 +98,12 @@ public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRe
     @SuppressWarnings("ConstantConditions")
     @Nonnull
     @Override
-    public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nonnull ItemStackSnapshot ingredient) {
-        return addIngredientPredicate(ingredient != ItemStackSnapshot.NONE ? new MatchesVanillaItemStack(ingredient) : null);
-    }
-
-    @Nonnull
-    @Override
-    public ShapelessCraftingRecipe.Builder result(@Nullable ItemStackSnapshot result) {
-        Preconditions.checkNotNull(result, "result");
-
-        this.exemplaryResult = result;
-
-        return this;
-    }
-
-    @Nonnull
-    @Override
     public ShapelessCraftingRecipe build() {
+        Preconditions.checkState(this.exemplaryResult != null && this.exemplaryResult != ItemStackSnapshot.NONE,
+                "The result is not set.");
+        Preconditions.checkState(!this.ingredients.isEmpty(),
+                "The ingredients are not set.");
+
         return new SpongeShapelessCraftingRecipe(exemplaryResult, ingredients);
     }
 
