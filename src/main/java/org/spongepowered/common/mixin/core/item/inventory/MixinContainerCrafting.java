@@ -24,10 +24,14 @@
  */
 package org.spongepowered.common.mixin.core.item.inventory;
 
+import net.minecraft.entity.player.EntityPlayer;
+import net.minecraft.inventory.ClickType;
 import net.minecraft.inventory.Container;
 import net.minecraft.inventory.ContainerPlayer;
 import net.minecraft.inventory.ContainerWorkbench;
 import net.minecraft.inventory.IContainerListener;
+import net.minecraft.inventory.IInventory;
+import net.minecraft.item.ItemStack;
 import org.spongepowered.asm.mixin.Mixin;
 
 @Mixin(value = {
@@ -36,17 +40,27 @@ import org.spongepowered.asm.mixin.Mixin;
 })
 public abstract class MixinContainerCrafting extends MixinContainer {
 
-    @Override
-    public void detectAndSendChanges(boolean captureOnly) {
-        super.detectAndSendChanges(captureOnly);
+    private final Container this$ = (Container) (Object) this;
 
-        if (!captureOnly) {
-            // Resend the CraftingOutput in case the client did not know the Recipe
+    @Override
+    public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
+        ItemStack result = super.slotClick(slotId, dragType, clickTypeIn, player);
+
+        if (slotId == 0) {
+            // Clicked the result
+            for (IInventory inventory : inventory$getInventory().allInventories()) {
+                for (IContainerListener listener : this.listeners) {
+                    //listener.sendAllWindowProperties(this$, inventory);
+                    listener.updateCraftingInventory(this$, getInventory());
+                }
+            }
+        } else {
             for (IContainerListener listener : this.listeners) {
-                //listener.updateCraftingInventory(((Container) (Object)this), this.getInventory());
-                listener.sendSlotContents(((Container) (Object)this), 0, this.getInventory().get(0));
+                listener.sendSlotContents(this$, 0, this.getInventory().get(0));
             }
         }
+
+        return result;
     }
 
 }
