@@ -22,7 +22,7 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.item.recipe.crafting;
+package org.spongepowered.common.item.inventory;
 
 import net.minecraft.inventory.IInventory;
 import net.minecraft.inventory.InventoryCrafting;
@@ -35,7 +35,9 @@ import org.spongepowered.common.item.inventory.lens.impl.slots.SlotLensImpl;
 
 import java.util.Iterator;
 
-public final class TemporaryUtilClass {
+public final class InventoryUtil {
+
+    private InventoryUtil() {}
 
     public static GridInventory toSpongeInventory(InventoryCrafting inv) {
         DefaultInventoryFabric fabric = new DefaultInventoryFabric(inv);
