@@ -120,10 +120,13 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
             }
 
             height++;
-            aisleRow = aisleIterator.next();
-        } while(aisleIterator.hasNext());
 
-        height++;
+            if (!aisleIterator.hasNext()) {
+                break;
+            }
+
+            aisleRow = aisleIterator.next();
+        } while(true);
 
         return new SpongeShapedCraftingRecipe(width, height, result, tableBuilder.build());
     }

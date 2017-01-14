@@ -62,6 +62,9 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
         int gapWidth = grid.getColumns() - getWidth();
         int gapHeight = grid.getRows() - getHeight();
 
+        if(gapWidth < 0 || gapHeight < 0)
+            return false;
+
         // Shift the aisle along the grid wherever possible
         for (int offsetX = 0; offsetX <= gapWidth; offsetX++) {
             byShiftingTheAisle:
@@ -78,21 +81,20 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
                         Optional<Predicate<ItemStackSnapshot>> ingredientPredicate = getIngredientPredicate(aisleX, aisleY);
 
                         if (itemStackOptional.isPresent() != ingredientPredicate.isPresent()) {
-                            System.out.println("optionals");
                             continue byShiftingTheAisle;
                         }
 
                         if (ingredientPredicate.isPresent() && !ingredientPredicate.get().test(itemStackOptional.get().createSnapshot())) {
-                            System.out.println("predicate");
                             continue byShiftingTheAisle;
                         }
                     }
                 }
 
-                // Make sure the gap is empty
-                for (int gapX = 0; gapX < gapWidth; gapX++) {
-                    for (int gapY = 0; gapY < gapHeight; gapY++) {
-                        int gridX = gapX + (gapX >= offsetX ? getWidth() : 0);
+                // Make sure the gap is empty:
+
+                // First ensure gap rows are empty
+                for (int gapY = 0; gapY < gapHeight; gapY++) {
+                    for (int gridX = 0; gridX < grid.getColumns(); gridX++) {
                         int gridY = gapY + (gapY >= offsetY ? getHeight() : 0);
                         boolean empty = grid.getSlot(gridX, gridY)
                                 .flatMap(Slot::peek)
@@ -100,7 +102,23 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
                                 .orElse(true);
 
                         if (!empty) {
-                            System.out.println("nonempty gap");
+                            continue byShiftingTheAisle;
+                        }
+                    }
+                }
+
+                // Then, check the remaining space to the left & right of the aisle
+                for (int aisleY = 0; aisleY < getHeight(); aisleY++) {
+                    for (int gapX = 0; gapX < gapWidth; gapX++) {
+                        int gridX = gapX + (gapX >= offsetX ? getWidth() : 0);
+                        int gridY = aisleY + offsetY;
+
+                        boolean empty = grid.getSlot(gridX, gridY)
+                                .flatMap(Slot::peek)
+                                .map(itemStack -> itemStack.getItem() == ItemTypes.NONE)
+                                .orElse(true);
+
+                        if (!empty) {
                             continue byShiftingTheAisle;
                         }
                     }
