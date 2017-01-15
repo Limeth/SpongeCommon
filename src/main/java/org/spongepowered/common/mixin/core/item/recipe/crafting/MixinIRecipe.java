@@ -40,26 +40,37 @@ import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 @Mixin(IRecipe.class)
 public interface MixinIRecipe extends CraftingRecipe {
 
+    @Shadow boolean matches(InventoryCrafting inv, net.minecraft.world.World worldIn);
+    @Shadow net.minecraft.item.ItemStack getCraftingResult(InventoryCrafting inv);
+    @Shadow int getRecipeSize();
+    @Shadow net.minecraft.item.ItemStack getRecipeOutput();
+    @Shadow NonNullList<net.minecraft.item.ItemStack> getRemainingItems(InventoryCrafting inv);
+
     @Override
+    @Nonnull
     default ItemStackSnapshot getExemplaryResult() {
         return ItemStackUtil.snapshotOf(getRecipeOutput());
     }
 
     @Override
-    default boolean isValid(GridInventory inv, World world) {
+    default boolean isValid(@Nonnull GridInventory inv, @Nonnull World world) {
         return matches(toNativeInventory(inv), (net.minecraft.world.World) world);
     }
 
     @Override
-    default ItemStackSnapshot getResult(GridInventory inv) {
+    @Nonnull
+    default ItemStackSnapshot getResult(@Nonnull GridInventory inv) {
         return ItemStackUtil.snapshotOf(getCraftingResult(toNativeInventory(inv)));
     }
 
     @Override
-    default List<ItemStackSnapshot> getRemainingItems(GridInventory inv) {
+    @Nonnull
+    default List<ItemStackSnapshot> getRemainingItems(@Nonnull GridInventory inv) {
         return getRemainingItems(toNativeInventory(inv)).stream()
                 .map(ItemStackUtil::snapshotOf)
                 .collect(Collectors.toList());
@@ -69,20 +80,5 @@ public interface MixinIRecipe extends CraftingRecipe {
     default int getSize() {
         return getRecipeSize();
     }
-
-    @Shadow
-    boolean matches(InventoryCrafting inv, net.minecraft.world.World worldIn);
-
-    @Shadow
-    net.minecraft.item.ItemStack getCraftingResult(InventoryCrafting inv);
-
-    @Shadow
-    int getRecipeSize();
-
-    @Shadow
-    net.minecraft.item.ItemStack getRecipeOutput();
-
-    @Shadow
-    NonNullList<net.minecraft.item.ItemStack> getRemainingItems(InventoryCrafting inv);
 
 }

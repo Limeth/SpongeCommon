@@ -40,8 +40,6 @@ import org.spongepowered.asm.mixin.Mixin;
 })
 public abstract class MixinContainerCrafting extends MixinContainer {
 
-    private final Container this$ = (Container) (Object) this;
-
     @Override
     public ItemStack slotClick(int slotId, int dragType, ClickType clickTypeIn, EntityPlayer player) {
         ItemStack result = super.slotClick(slotId, dragType, clickTypeIn, player);
@@ -51,12 +49,12 @@ public abstract class MixinContainerCrafting extends MixinContainer {
             for (IInventory inventory : inventory$getInventory().allInventories()) {
                 for (IContainerListener listener : this.listeners) {
                     //listener.sendAllWindowProperties(this$, inventory);
-                    listener.updateCraftingInventory(this$, getInventory());
+                    listener.updateCraftingInventory((Container) (Object) this, getInventory());
                 }
             }
         } else {
             for (IContainerListener listener : this.listeners) {
-                listener.sendSlotContents(this$, 0, this.getInventory().get(0));
+                listener.sendSlotContents((Container) (Object) this, 0, this.getInventory().get(0));
             }
         }
 

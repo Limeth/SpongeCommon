@@ -39,12 +39,15 @@ import java.util.List;
 import java.util.function.Predicate;
 import java.util.stream.Collectors;
 
+import javax.annotation.Nonnull;
+
 @Mixin(ShapelessRecipes.class)
 public abstract class MixinShapelessRecipes implements IRecipe, ShapelessCraftingRecipe {
 
     @Shadow @Final private List<ItemStack> recipeItems;
 
     @Override
+    @Nonnull
     public List<Predicate<ItemStackSnapshot>> getIngredientPredicates() {
         return recipeItems.stream()
                 .map(ItemStackUtil::snapshotOf)

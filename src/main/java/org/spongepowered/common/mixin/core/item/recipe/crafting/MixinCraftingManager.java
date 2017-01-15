@@ -38,34 +38,34 @@ import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 
+import javax.annotation.Nonnull;
+
 @Mixin(CraftingManager.class)
 public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
 
     @Shadow @Final private List<IRecipe> recipes;
 
     @Override
-    public void register(CraftingRecipe recipe) {
+    public void register(@Nonnull CraftingRecipe recipe) {
         if (!(recipe instanceof IRecipe)) {
             recipe = new DelegateSpongeCraftingRecipe(recipe);
         }
 
-        spongeRecipes().add(recipe);
+        recipes.add((IRecipe) recipe);
         SpongeImplHooks.onCraftingRecipeRegister(recipe);
     }
 
+    @SuppressWarnings("SuspiciousMethodCalls")
     @Override
-    public void remove(CraftingRecipe recipe) {
-        spongeRecipes().remove(recipe);
-    }
-
-    @Override
-    public Collection<CraftingRecipe> getRecipes() {
-        return Collections.unmodifiableList(spongeRecipes());
+    public void remove(@Nonnull CraftingRecipe recipe) {
+        recipes.remove(recipe);
     }
 
     @SuppressWarnings("unchecked")
-    private List<CraftingRecipe> spongeRecipes() {
-        return (List<CraftingRecipe>) (List<?>) recipes;
+    @Override
+    @Nonnull
+    public Collection<CraftingRecipe> getRecipes() {
+        return Collections.unmodifiableList((List<CraftingRecipe>) (List<?>) recipes);
     }
 
 }
