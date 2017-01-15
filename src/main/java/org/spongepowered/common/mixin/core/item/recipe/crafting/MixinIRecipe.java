@@ -33,6 +33,8 @@ import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.world.World;
+import org.spongepowered.asm.mixin.Implements;
+import org.spongepowered.asm.mixin.Interface;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
@@ -43,6 +45,7 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 @Mixin(IRecipe.class)
+@Implements(@Interface(iface = CraftingRecipe.class, prefix = "", unique = true))
 public interface MixinIRecipe extends CraftingRecipe {
 
     @Shadow boolean matches(InventoryCrafting inv, net.minecraft.world.World worldIn);
