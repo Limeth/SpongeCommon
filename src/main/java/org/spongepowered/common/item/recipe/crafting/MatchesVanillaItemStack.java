@@ -36,6 +36,7 @@ import java.util.function.Predicate;
  * Needs to be a separate class so it can be used in mixed-in code
  */
 public class MatchesVanillaItemStack implements Predicate<ItemStackSnapshot> {
+
     private final ItemStackSnapshot itemStackSnapshot;
 
     public MatchesVanillaItemStack(ItemStackSnapshot itemStackSnapshot) {
@@ -62,24 +63,21 @@ public class MatchesVanillaItemStack implements Predicate<ItemStackSnapshot> {
         net.minecraft.item.ItemStack recipeNMS = ItemStackUtil.fromSnapshotToNative(recipeStack);
         net.minecraft.item.ItemStack inventoryNMS = ItemStackUtil.fromSnapshotToNative(inventoryStack);
 
-        if (!recipeNMS.isEmpty() || !inventoryNMS.isEmpty())
-        {
-            if (recipeNMS.isEmpty() != inventoryNMS.isEmpty())
-            {
+        if (!recipeNMS.isEmpty() || !inventoryNMS.isEmpty()) {
+            if (recipeNMS.isEmpty() != inventoryNMS.isEmpty()) {
                 return false;
             }
 
-            if (recipeNMS.getItem() != inventoryNMS.getItem())
-            {
+            if (recipeNMS.getItem() != inventoryNMS.getItem()) {
                 return false;
             }
 
-            if (recipeNMS.getMetadata() != 32767 && recipeNMS.getMetadata() != inventoryNMS.getMetadata())
-            {
+            if (recipeNMS.getMetadata() != 32767 && recipeNMS.getMetadata() != inventoryNMS.getMetadata()) {
                 return false;
             }
         }
 
         return true;
     }
+
 }

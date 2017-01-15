@@ -25,20 +25,36 @@
 package org.spongepowered.common.item.inventory.util;
 
 import net.minecraft.inventory.IInventory;
-import net.minecraft.item.ItemStack;
-import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import net.minecraft.inventory.InventoryCrafting;
+import org.spongepowered.api.item.inventory.type.GridInventory;
+import org.spongepowered.common.item.inventory.adapter.impl.comp.GridInventoryAdapter;
 import org.spongepowered.common.item.inventory.lens.Fabric;
-import org.spongepowered.common.item.inventory.lens.comp.GridInventoryLens;
-import org.spongepowered.common.item.inventory.lens.slots.SlotLens;
+import org.spongepowered.common.item.inventory.lens.impl.comp.GridInventoryLensImpl;
+import org.spongepowered.common.item.inventory.lens.impl.fabric.DefaultInventoryFabric;
+import org.spongepowered.common.item.inventory.lens.impl.slots.SlotLensImpl;
 
-import java.util.Optional;
+import java.util.Iterator;
 
-// TODO
-public class RecipeUtil {
+public final class InventoryUtil {
 
-    public static Optional<CraftingRecipe> findMatchingRecipe(Fabric<IInventory> inventory, GridInventoryLens<IInventory, ItemStack> craftingGrid, SlotLens<IInventory, ItemStack> outputSlot) {
-        // TODO Auto-generated method stub
-        return null;
+    private InventoryUtil() {}
+
+    public static GridInventory toSpongeInventory(InventoryCrafting inv) {
+        DefaultInventoryFabric fabric = new DefaultInventoryFabric(inv);
+        GridInventoryLensImpl lens = new GridInventoryLensImpl(0, inv.getWidth(), inv.getHeight(), inv.getWidth(), SlotLensImpl::new);
+
+        return new GridInventoryAdapter(fabric, lens);
+    }
+
+    public static InventoryCrafting toNativeInventory(GridInventory inv) {
+        Fabric<IInventory> fabric = ((GridInventoryAdapter) inv).getInventory();
+        Iterator<IInventory> inventories = fabric.allInventories().iterator();
+        InventoryCrafting inventoryCrafting = (InventoryCrafting) inventories.next();
+
+        if(inventories.hasNext())
+            throw new IllegalStateException("Another inventory found: " + inventories.next());
+
+        return inventoryCrafting;
     }
 
 }

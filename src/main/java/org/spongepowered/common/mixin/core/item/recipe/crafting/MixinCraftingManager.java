@@ -24,19 +24,24 @@
  */
 package org.spongepowered.common.mixin.core.item.recipe.crafting;
 
+import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
+import org.spongepowered.api.world.World;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.SpongeImplHooks;
+import org.spongepowered.common.item.inventory.util.InventoryUtil;
 import org.spongepowered.common.item.recipe.crafting.DelegateSpongeCraftingRecipe;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import javax.annotation.Nonnull;
 
@@ -68,4 +73,19 @@ public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
         return Collections.unmodifiableList((List<CraftingRecipe>) (List<?>) recipes);
     }
 
+    @Override
+    @Nonnull
+    public Optional<CraftingRecipe> findMatchingRecipe(@Nonnull GridInventory grid, @Nonnull World world) {
+        InventoryCrafting nativeInventory = InventoryUtil.toNativeInventory(grid);
+
+        for (IRecipe irecipe : this.recipes)
+        {
+            if (irecipe.matches(nativeInventory, (net.minecraft.world.World) world))
+            {
+                return Optional.of((CraftingRecipe) irecipe);
+            }
+        }
+
+        return Optional.empty();
+    }
 }

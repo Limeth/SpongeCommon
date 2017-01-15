@@ -24,7 +24,8 @@
  */
 package org.spongepowered.common;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import net.minecraft.block.Block;
 import net.minecraft.block.ITileEntityProvider;
 import net.minecraft.block.state.IBlockState;
@@ -207,7 +208,7 @@ public final class SpongeImplHooks {
 
     @Nonnull
     public static Optional<ItemStack> getContainerItem(@Nonnull ItemStack itemStack) {
-        Preconditions.checkNotNull(itemStack, "The itemStack must not be null");
+        checkNotNull(itemStack, "The itemStack must not be null");
 
         net.minecraft.item.ItemStack nmsStack = ItemStackUtil.toNative(itemStack);
         Item nmsItem = nmsStack.getItem();

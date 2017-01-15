@@ -24,17 +24,22 @@
  */
 package org.spongepowered.common.item.inventory.adapter.impl.comp;
 
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import net.minecraft.inventory.IInventory;
+import org.spongepowered.api.Sponge;
 import org.spongepowered.api.item.inventory.Inventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingInventory;
 import org.spongepowered.api.item.inventory.crafting.CraftingOutput;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
+import org.spongepowered.api.world.World;
 import org.spongepowered.common.item.inventory.lens.Fabric;
 import org.spongepowered.common.item.inventory.lens.comp.CraftingInventoryLens;
-import org.spongepowered.common.item.inventory.util.RecipeUtil;
 
 import java.util.Optional;
+
+import javax.annotation.Nonnull;
 
 public class CraftingInventoryAdapter extends GridInventoryAdapter implements CraftingInventory {
 
@@ -53,6 +58,7 @@ public class CraftingInventoryAdapter extends GridInventoryAdapter implements Cr
     }
 
     @Override
+    @Nonnull
     public GridInventory getCraftingGrid() {
         if (this.craftingGrid == null) {
             this.craftingGrid = (GridInventory) this.craftingLens.getCraftingGrid().getAdapter(this.inventory, this);
@@ -61,6 +67,7 @@ public class CraftingInventoryAdapter extends GridInventoryAdapter implements Cr
     }
 
     @Override
+    @Nonnull
     public CraftingOutput getResult() {
         if (this.result == null) {
             this.result = (CraftingOutput) this.craftingLens.getOutputSlot().getAdapter(this.inventory, this);
@@ -69,8 +76,12 @@ public class CraftingInventoryAdapter extends GridInventoryAdapter implements Cr
     }
 
     @Override
-    public Optional<CraftingRecipe> getRecipe() {
-        return RecipeUtil.findMatchingRecipe(this.inventory, this.craftingLens.getCraftingGrid(), this.craftingLens.getOutputSlot());
+    @Nonnull
+    public Optional<CraftingRecipe> getRecipe(@Nonnull World world) {
+        checkNotNull(world, "world");
+
+        return Sponge.getRegistry().getCraftingRecipeRegistry()
+                .findMatchingRecipe(this.craftingGrid, world);
     }
 
 }

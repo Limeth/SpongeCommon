@@ -24,7 +24,7 @@
  */
 package org.spongepowered.common.mixin.core.item.recipe.crafting;
 
-import static org.spongepowered.common.item.inventory.InventoryUtil.toNativeInventory;
+import static org.spongepowered.common.item.inventory.util.InventoryUtil.toNativeInventory;
 
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.crafting.IRecipe;
