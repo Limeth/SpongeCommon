@@ -80,7 +80,7 @@ public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRe
     public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nonnull ItemStackSnapshot ingredient) {
         checkNotNull(ingredient, "ingredient");
 
-        return addIngredientPredicate(new MatchesVanillaItemStack(ingredient));
+        return addIngredientPredicate(new MatchCraftingVanillaItemStack(ingredient));
     }
 
     @SuppressWarnings("ConstantConditions")

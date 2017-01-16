@@ -22,37 +22,49 @@
  * OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN
  * THE SOFTWARE.
  */
-package org.spongepowered.common.mixin.core.item.recipe.crafting;
+package org.spongepowered.common.item.recipe.smelting;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.item.ItemStack;
-import net.minecraft.item.crafting.IRecipe;
-import net.minecraft.item.crafting.ShapelessRecipes;
+import net.minecraft.item.crafting.FurnaceRecipes;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
-import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
-import org.spongepowered.asm.mixin.Final;
-import org.spongepowered.asm.mixin.Mixin;
-import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
-import org.spongepowered.common.item.recipe.crafting.MatchCraftingVanillaItemStack;
 
-import java.util.List;
 import java.util.function.Predicate;
-import java.util.stream.Collectors;
 
-import javax.annotation.Nonnull;
+/**
+ * Needs to be a separate class so it can be used in mixed-in code
+ */
+public class MatchSmeltingVanillaItemStack implements Predicate<ItemStackSnapshot> {
 
-@Mixin(ShapelessRecipes.class)
-public abstract class MixinShapelessRecipes implements IRecipe, ShapelessCraftingRecipe {
+    private final ItemStackSnapshot itemStackSnapshot;
 
-    @Shadow @Final private List<ItemStack> recipeItems;
+    public MatchSmeltingVanillaItemStack(ItemStackSnapshot itemStackSnapshot) {
+        Preconditions.checkNotNull(itemStackSnapshot, "The itemStackSnapshot must not be null");
+
+        this.itemStackSnapshot = itemStackSnapshot;
+    }
 
     @Override
-    @Nonnull
-    public List<Predicate<ItemStackSnapshot>> getIngredientPredicates() {
-        return recipeItems.stream()
-                .map(ItemStackUtil::snapshotOf)
-                .map(MatchCraftingVanillaItemStack::new)
-                .collect(Collectors.toList());
+    public boolean test(ItemStackSnapshot itemStackSnapshot) {
+        return matchesVanillaItemStack(this.itemStackSnapshot, itemStackSnapshot);
+    }
+
+    public static boolean matchesVanillaItemStack(ItemStackSnapshot recipeStack, ItemStackSnapshot inventoryStack) {
+        ItemStack recipe = ItemStackUtil.fromSnapshotToNative(recipeStack);
+        ItemStack inventory = ItemStackUtil.fromSnapshotToNative(inventoryStack);
+
+        return compareItemStacks(inventory, recipe);
+    }
+
+    /**
+     * Same method, but static.
+     *
+     * @see FurnaceRecipes#compareItemStacks(ItemStack, ItemStack)
+     */
+    public static boolean compareItemStacks(ItemStack stack1, ItemStack stack2)
+    {
+        return stack2.getItem() == stack1.getItem() && (stack2.getMetadata() == 32767 || stack2.getMetadata() == stack1.getMetadata());
     }
 
 }

@@ -32,7 +32,7 @@ import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
-import org.spongepowered.common.item.recipe.crafting.MatchesVanillaItemStack;
+import org.spongepowered.common.item.recipe.crafting.MatchCraftingVanillaItemStack;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -56,7 +56,7 @@ public abstract class MixinShapedRecipes implements IRecipe, ShapedCraftingRecip
         int recipeItemIndex = x + y * recipeWidth;
         ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(recipeItems[recipeItemIndex]);
 
-        return Optional.of(new MatchesVanillaItemStack(recipeSnapshot));
+        return Optional.of(new MatchCraftingVanillaItemStack(recipeSnapshot));
     }
 
     @Override

@@ -81,7 +81,7 @@ public final class SpongeShapedCraftingRecipeBuilder implements ShapedCraftingRe
     @Override
     public ShapedCraftingRecipe.Builder where(char symbol, @Nullable ItemStackSnapshot ingredient) throws IllegalArgumentException {
         return where(symbol, ingredient != null && ingredient != ItemStackSnapshot.NONE
-                ? new MatchesVanillaItemStack(ingredient) : null);
+                ? new MatchCraftingVanillaItemStack(ingredient) : null);
     }
 
     @Nonnull

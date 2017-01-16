@@ -35,11 +35,11 @@ import java.util.function.Predicate;
 /**
  * Needs to be a separate class so it can be used in mixed-in code
  */
-public class MatchesVanillaItemStack implements Predicate<ItemStackSnapshot> {
+public class MatchCraftingVanillaItemStack implements Predicate<ItemStackSnapshot> {
 
     private final ItemStackSnapshot itemStackSnapshot;
 
-    public MatchesVanillaItemStack(ItemStackSnapshot itemStackSnapshot) {
+    public MatchCraftingVanillaItemStack(ItemStackSnapshot itemStackSnapshot) {
         Preconditions.checkNotNull(itemStackSnapshot, "The itemStackSnapshot must not be null");
 
         this.itemStackSnapshot = itemStackSnapshot;
