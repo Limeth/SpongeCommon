@@ -93,8 +93,7 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
                         Optional<ItemStack> itemStackOptional = slot.peek();
                         ItemStackSnapshot itemStackSnapshot = itemStackOptional.map(ItemStack::createSnapshot)
                                 .orElse(ItemStackSnapshot.NONE);
-                        Predicate<ItemStackSnapshot> ingredientPredicate = getIngredientPredicate(aisleX, aisleY)
-                                .orElseThrow(() -> new IllegalStateException("Could not access an ingredient predicate, even though all should be set."));
+                        Predicate<ItemStackSnapshot> ingredientPredicate = getIngredientPredicate(aisleX, aisleY);
 
                         if (!ingredientPredicate.test(itemStackSnapshot)) {
                             continue byShiftingTheAisle;
@@ -163,8 +162,9 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     }
 
     @Override
-    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
-        return Optional.ofNullable(this.ingredients.get(x, y));
+    public Predicate<ItemStackSnapshot> getIngredientPredicate(int x, int y) {
+        return Optional.ofNullable(this.ingredients.get(x, y))
+                .orElseGet(() -> itemStackSnapshot -> false);
     }
 
     @Override

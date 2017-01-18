@@ -45,7 +45,6 @@ import java.util.stream.Collectors;
 import javax.annotation.Nonnull;
 
 @Mixin(IRecipe.class)
-@Implements(@Interface(iface = CraftingRecipe.class, prefix = "", unique = true))
 public interface MixinIRecipe extends CraftingRecipe {
 
     @Shadow boolean matches(InventoryCrafting inv, net.minecraft.world.World worldIn);
