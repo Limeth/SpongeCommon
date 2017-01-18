@@ -54,25 +54,30 @@ public class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
     private final List<SmeltingRecipe> recipes = Lists.newArrayList();
 
     /**
-     * @author Limeth
+     * @author Limeth - 17. 1. 2017
+     * @reason Instead of using the {@link Map}s in {@link FurnaceRecipes}, we
+     *         mixin and maintain a list of {@link SmeltingRecipe}s. This is to
+     *         allow recipe resolution via ingredient predicates, which are not
+     *         normally supported in vanilla.
      */
     @Overwrite
-    public void addSmeltingRecipe(ItemStack input, ItemStack stack, float experience)
-    {
+    public void addSmeltingRecipe(ItemStack input, ItemStack stack, float experience) {
         ItemStackSnapshot exemplaryResult = ItemStackUtil.snapshotOf(stack);
         ItemStackSnapshot exemplaryIngredient = ItemStackUtil.snapshotOf(input);
         Predicate<ItemStackSnapshot> ingredientPredicate = new MatchSmeltingVanillaItemStack(exemplaryIngredient);
 
-        this.recipes.add(new SpongeSmeltingRecipe(exemplaryResult,
-                exemplaryIngredient, ingredientPredicate, experience));
+        this.recipes.add(new SpongeSmeltingRecipe(exemplaryResult, exemplaryIngredient, ingredientPredicate, experience));
     }
 
     /**
-     * @author Limeth
+     * @author Limeth - 17. 1. 2017
+     * @reason Instead of using the {@link Map}s in {@link FurnaceRecipes}, we
+     *         mixin and maintain a list of {@link SmeltingRecipe}s. This is to
+     *         allow recipe resolution via ingredient predicates, which are not
+     *         normally supported in vanilla.
      */
     @Overwrite
-    public ItemStack getSmeltingResult(ItemStack stack)
-    {
+    public ItemStack getSmeltingResult(ItemStack stack) {
         ItemStackSnapshot ingredient = ItemStackUtil.snapshotOf(stack);
         Optional<SmeltingResult> result = getResult(ingredient);
 
@@ -85,11 +90,14 @@ public class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
     }
 
     /**
-     * @author Limeth
+     * @author Limeth - 17. 1. 2017
+     * @reason Instead of using the {@link Map}s in {@link FurnaceRecipes}, we
+     *         mixin and maintain a list of {@link SmeltingRecipe}s. This is to
+     *         allow recipe resolution via ingredient predicates, which are not
+     *         normally supported in vanilla.
      */
     @Overwrite
-    public float getSmeltingExperience(ItemStack stack)
-    {
+    public float getSmeltingExperience(ItemStack stack) {
         ItemStackSnapshot ingredient = ItemStackUtil.snapshotOf(stack);
         Optional<SmeltingResult> result = getResult(ingredient);
 
@@ -102,7 +110,11 @@ public class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
     }
 
     /**
-     * @author Limeth
+     * @author Limeth - 17. 1. 2017
+     * @reason Instead of using the {@link Map}s in {@link FurnaceRecipes}, we
+     *         mixin and maintain a list of {@link SmeltingRecipe}s. This is to
+     *         allow recipe resolution via ingredient predicates, which are not
+     *         normally supported in vanilla.
      */
     @Overwrite
     public Map<ItemStack, ItemStack> getSmeltingList() {

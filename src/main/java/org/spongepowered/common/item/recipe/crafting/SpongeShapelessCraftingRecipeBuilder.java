@@ -26,8 +26,8 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import static com.google.common.base.Preconditions.checkArgument;
 import static com.google.common.base.Preconditions.checkNotNull;
+import static com.google.common.base.Preconditions.checkState;
 
-import com.google.common.base.Preconditions;
 import com.google.common.collect.Lists;
 import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
@@ -35,19 +35,16 @@ import org.spongepowered.api.item.recipe.crafting.ShapelessCraftingRecipe;
 import java.util.List;
 import java.util.function.Predicate;
 
-import javax.annotation.Nonnull;
-
 public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRecipe.Builder {
 
     private ItemStackSnapshot exemplaryResult = ItemStackSnapshot.NONE;
     private List<Predicate<ItemStackSnapshot>> ingredients = Lists.newArrayList();
 
-    @Nonnull
     @Override
-    public ShapelessCraftingRecipe.Builder from(@Nonnull ShapelessCraftingRecipe value) {
+    public ShapelessCraftingRecipe.Builder from(ShapelessCraftingRecipe value) {
         this.exemplaryResult = value.getExemplaryResult();
 
-        if (exemplaryResult == null) {
+        if (this.exemplaryResult == null) {
             this.exemplaryResult = ItemStackSnapshot.NONE;
         }
 
@@ -57,7 +54,6 @@ public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRe
         return this;
     }
 
-    @Nonnull
     @Override
     public ShapelessCraftingRecipe.Builder reset() {
         this.exemplaryResult = ItemStackSnapshot.NONE;
@@ -66,27 +62,24 @@ public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRe
         return this;
     }
 
-    @Nonnull
     @Override
-    public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nonnull Predicate<ItemStackSnapshot> ingredient) {
+    public ShapelessCraftingRecipe.Builder addIngredientPredicate(Predicate<ItemStackSnapshot> ingredient) {
         checkNotNull(ingredient, "ingredient");
         this.ingredients.add(ingredient);
 
         return this;
     }
 
-    @Nonnull
     @Override
-    public ShapelessCraftingRecipe.Builder addIngredientPredicate(@Nonnull ItemStackSnapshot ingredient) {
+    public ShapelessCraftingRecipe.Builder addIngredientPredicate(ItemStackSnapshot ingredient) {
         checkNotNull(ingredient, "ingredient");
 
         return addIngredientPredicate(new MatchCraftingVanillaItemStack(ingredient));
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Nonnull
     @Override
-    public ShapelessCraftingRecipe.Builder result(@Nonnull ItemStackSnapshot result) {
+    public ShapelessCraftingRecipe.Builder result(ItemStackSnapshot result) {
         checkNotNull(result, "result");
         checkArgument(result != ItemStackSnapshot.NONE, "The result must not be `ItemStackSnapshot.NONE`.");
 
@@ -96,15 +89,14 @@ public class SpongeShapelessCraftingRecipeBuilder implements ShapelessCraftingRe
     }
 
     @SuppressWarnings("ConstantConditions")
-    @Nonnull
     @Override
     public ShapelessCraftingRecipe build() {
-        Preconditions.checkState(this.exemplaryResult != null && this.exemplaryResult != ItemStackSnapshot.NONE,
+        checkState(this.exemplaryResult != null && this.exemplaryResult != ItemStackSnapshot.NONE,
                 "The result is not set.");
-        Preconditions.checkState(!this.ingredients.isEmpty(),
+        checkState(!this.ingredients.isEmpty(),
                 "The ingredients are not set.");
 
-        return new SpongeShapelessCraftingRecipe(exemplaryResult, ingredients);
+        return new SpongeShapelessCraftingRecipe(this.exemplaryResult, this.ingredients);
     }
 
 }

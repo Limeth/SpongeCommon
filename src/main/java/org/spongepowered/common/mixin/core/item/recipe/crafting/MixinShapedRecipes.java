@@ -34,10 +34,7 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.item.inventory.util.ItemStackUtil;
 import org.spongepowered.common.item.recipe.crafting.MatchCraftingVanillaItemStack;
 
-import java.util.Optional;
 import java.util.function.Predicate;
-
-import javax.annotation.Nonnull;
 
 @Mixin(ShapedRecipes.class)
 public abstract class MixinShapedRecipes implements IRecipe, ShapedCraftingRecipe {
@@ -47,16 +44,15 @@ public abstract class MixinShapedRecipes implements IRecipe, ShapedCraftingRecip
     @Shadow @Final private net.minecraft.item.ItemStack[] recipeItems;
 
     @Override
-    @Nonnull
-    public Optional<Predicate<ItemStackSnapshot>> getIngredientPredicate(int x, int y) {
+    public Predicate<ItemStackSnapshot> getIngredientPredicate(int x, int y) {
         if (x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight) {
-            return Optional.empty();
+            return MatchCraftingVanillaItemStack.never();
         }
 
         int recipeItemIndex = x + y * recipeWidth;
         ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(recipeItems[recipeItemIndex]);
 
-        return Optional.of(new MatchCraftingVanillaItemStack(recipeSnapshot));
+        return new MatchCraftingVanillaItemStack(recipeSnapshot);
     }
 
     @Override

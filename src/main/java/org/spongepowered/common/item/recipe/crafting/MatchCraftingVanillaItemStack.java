@@ -45,9 +45,19 @@ public class MatchCraftingVanillaItemStack implements Predicate<ItemStackSnapsho
         this.itemStackSnapshot = itemStackSnapshot;
     }
 
+    private MatchCraftingVanillaItemStack() {
+        this.itemStackSnapshot = null;
+    }
+
+    public static MatchCraftingVanillaItemStack never() {
+        return new MatchCraftingVanillaItemStack();
+    }
+
     @Override
     public boolean test(ItemStackSnapshot itemStackSnapshot) {
-        return matchesVanillaItemStack(this.itemStackSnapshot, itemStackSnapshot);
+        return this.itemStackSnapshot != null && matchesVanillaItemStack(
+                this.itemStackSnapshot, itemStackSnapshot);
+
     }
 
     /**

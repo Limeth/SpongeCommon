@@ -8,8 +8,6 @@ import org.spongepowered.api.world.World;
 
 import java.util.List;
 
-import javax.annotation.Nonnull;
-
 public class DelegateSpongeCraftingRecipe extends AbstractSpongeCraftingRecipe {
 
     private final CraftingRecipe recipe;
@@ -21,25 +19,22 @@ public class DelegateSpongeCraftingRecipe extends AbstractSpongeCraftingRecipe {
     }
 
     @Override
-    @Nonnull
     public ItemStackSnapshot getExemplaryResult() {
         return this.recipe.getExemplaryResult();
     }
 
     @Override
-    public boolean isValid(@Nonnull GridInventory grid, @Nonnull World world) {
+    public boolean isValid(GridInventory grid, World world) {
         return this.recipe.isValid(grid, world);
     }
 
     @Override
-    @Nonnull
-    public ItemStackSnapshot getResult(@Nonnull GridInventory grid) {
+    public ItemStackSnapshot getResult(GridInventory grid) {
         return this.recipe.getResult(grid);
     }
 
     @Override
-    @Nonnull
-    public List<ItemStackSnapshot> getRemainingItems(@Nonnull GridInventory grid) {
+    public List<ItemStackSnapshot> getRemainingItems(GridInventory grid) {
         return this.recipe.getRemainingItems(grid);
     }
 

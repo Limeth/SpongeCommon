@@ -43,15 +43,13 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
-
 @Mixin(CraftingManager.class)
 public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
 
     @Shadow @Final private List<IRecipe> recipes;
 
     @Override
-    public void register(@Nonnull CraftingRecipe recipe) {
+    public void register(CraftingRecipe recipe) {
         if (!(recipe instanceof IRecipe)) {
             recipe = new DelegateSpongeCraftingRecipe(recipe);
         }
@@ -62,20 +60,18 @@ public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
 
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
-    public void remove(@Nonnull CraftingRecipe recipe) {
+    public void remove(CraftingRecipe recipe) {
         recipes.remove(recipe);
     }
 
     @SuppressWarnings("unchecked")
     @Override
-    @Nonnull
     public Collection<CraftingRecipe> getRecipes() {
         return Collections.unmodifiableList((List<CraftingRecipe>) (List<?>) recipes);
     }
 
     @Override
-    @Nonnull
-    public Optional<CraftingRecipe> findMatchingRecipe(@Nonnull GridInventory grid, @Nonnull World world) {
+    public Optional<CraftingRecipe> findMatchingRecipe(GridInventory grid, World world) {
         InventoryCrafting nativeInventory = InventoryUtil.toNativeInventory(grid);
 
         for (IRecipe irecipe : this.recipes)

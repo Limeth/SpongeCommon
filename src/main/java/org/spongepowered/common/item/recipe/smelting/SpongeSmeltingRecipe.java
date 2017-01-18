@@ -81,8 +81,8 @@ public class SpongeSmeltingRecipe implements SmeltingRecipe {
     public Optional<SmeltingResult> getResult(@Nonnull ItemStackSnapshot ingredient) {
         if (isValid(ingredient)) {
             return Optional.of(new SmeltingResult(this.exemplaryResult, this.experience));
-        } else {
-            return Optional.empty();
         }
+
+        return Optional.empty();
     }
 }

@@ -58,7 +58,6 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.Optional;
 
-import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
 
 /**
@@ -206,11 +205,15 @@ public final class SpongeImplHooks {
 
     // Crafting
 
-    @Nonnull
-    public static Optional<ItemStack> getContainerItem(@Nonnull ItemStack itemStack) {
+    public static Optional<ItemStack> getContainerItem(ItemStack itemStack) {
         checkNotNull(itemStack, "The itemStack must not be null");
 
         net.minecraft.item.ItemStack nmsStack = ItemStackUtil.toNative(itemStack);
+
+        if (nmsStack.isEmpty()) {
+            return Optional.empty();
+        }
+
         Item nmsItem = nmsStack.getItem();
 
         if (nmsItem.hasContainerItem()) {

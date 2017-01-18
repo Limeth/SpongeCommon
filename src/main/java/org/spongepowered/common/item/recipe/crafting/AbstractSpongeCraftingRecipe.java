@@ -26,6 +26,7 @@ package org.spongepowered.common.item.recipe.crafting;
 
 import static org.spongepowered.common.item.inventory.util.InventoryUtil.toSpongeInventory;
 
+import com.google.common.base.Preconditions;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.ItemStack;
 import net.minecraft.item.crafting.IRecipe;
@@ -42,13 +43,10 @@ import java.util.function.Function;
 import java.util.function.Supplier;
 
 public abstract class AbstractSpongeCraftingRecipe implements CraftingRecipe, IRecipe {
+
     @Override
     public boolean matches(InventoryCrafting inv, net.minecraft.world.World worldIn) {
         return matches(this::isValid, inv, worldIn);
-    }
-
-    public static boolean matches(BiFunction<GridInventory, World, Boolean> isValid, InventoryCrafting inv, net.minecraft.world.World worldIn) {
-        return isValid.apply(toSpongeInventory(inv), (World) worldIn);
     }
 
     @Override
@@ -56,17 +54,9 @@ public abstract class AbstractSpongeCraftingRecipe implements CraftingRecipe, IR
         return getCraftingResult(this::getResult, inv);
     }
 
-    public static ItemStack getCraftingResult(Function<GridInventory, ItemStackSnapshot> getResult, InventoryCrafting inv) {
-        return ItemStackUtil.fromSnapshotToNative(getResult.apply(toSpongeInventory(inv)));
-    }
-
     @Override
     public int getRecipeSize() {
         return getRecipeSize(this::getSize);
-    }
-
-    public static int getRecipeSize(Supplier<Integer> getSize) {
-        return getSize.get();
     }
 
     @Override
@@ -74,13 +64,29 @@ public abstract class AbstractSpongeCraftingRecipe implements CraftingRecipe, IR
         return getRecipeOutput(this::getExemplaryResult);
     }
 
-    public static ItemStack getRecipeOutput(Supplier<ItemStackSnapshot> getExemplaryResult) {
-        return ItemStackUtil.fromSnapshotToNative(getExemplaryResult.get());
-    }
-
     @Override
     public NonNullList<ItemStack> getRemainingItems(InventoryCrafting inv) {
         return getRemainingItems(this::getRemainingItems, inv);
+    }
+
+    public static boolean matches(BiFunction<GridInventory, World, Boolean> isValid, InventoryCrafting inv, net.minecraft.world.World worldIn) {
+        return isValid.apply(toSpongeInventory(inv), (World) worldIn);
+    }
+
+    public static ItemStack getCraftingResult(Function<GridInventory, ItemStackSnapshot> getResult, InventoryCrafting inv) {
+        ItemStackSnapshot result = getResult.apply(toSpongeInventory(inv));
+
+        Preconditions.checkNotNull(result, "The Sponge implementation returned a `null` result.");
+
+        return ItemStackUtil.fromSnapshotToNative(result);
+    }
+
+    public static int getRecipeSize(Supplier<Integer> getSize) {
+        return getSize.get();
+    }
+
+    public static ItemStack getRecipeOutput(Supplier<ItemStackSnapshot> getExemplaryResult) {
+        return ItemStackUtil.fromSnapshotToNative(getExemplaryResult.get());
     }
 
     public static NonNullList<ItemStack> getRemainingItems(Function<GridInventory, List<ItemStackSnapshot>> getRemainingItems, InventoryCrafting inv) {
@@ -100,4 +106,5 @@ public abstract class AbstractSpongeCraftingRecipe implements CraftingRecipe, IR
 
         return result;
     }
+
 }
