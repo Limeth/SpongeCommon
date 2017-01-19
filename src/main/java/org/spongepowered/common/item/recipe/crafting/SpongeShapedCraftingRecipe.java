@@ -164,7 +164,7 @@ public class SpongeShapedCraftingRecipe extends ShapedRecipes implements ShapedC
     @Override
     public Predicate<ItemStackSnapshot> getIngredientPredicate(int x, int y) {
         return Optional.ofNullable(this.ingredients.get(x, y))
-                .orElseGet(() -> itemStackSnapshot -> false);
+                .orElseThrow(() -> new IndexOutOfBoundsException("Invalid ingredient predicate location"));
     }
 
     @Override
