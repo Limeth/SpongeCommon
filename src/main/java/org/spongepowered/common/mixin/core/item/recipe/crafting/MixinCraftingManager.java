@@ -27,6 +27,7 @@ package org.spongepowered.common.mixin.core.item.recipe.crafting;
 import net.minecraft.inventory.InventoryCrafting;
 import net.minecraft.item.crafting.CraftingManager;
 import net.minecraft.item.crafting.IRecipe;
+import org.spongepowered.api.item.inventory.ItemStackSnapshot;
 import org.spongepowered.api.item.inventory.type.GridInventory;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipe;
 import org.spongepowered.api.item.recipe.crafting.CraftingRecipeRegistry;
@@ -37,11 +38,13 @@ import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.common.SpongeImplHooks;
 import org.spongepowered.common.item.inventory.util.InventoryUtil;
 import org.spongepowered.common.item.recipe.crafting.DelegateSpongeCraftingRecipe;
+import org.spongepowered.common.item.recipe.crafting.MatchCraftingVanillaItemStack;
 
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
+import java.util.function.Predicate;
 
 @Mixin(CraftingManager.class)
 public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
@@ -83,5 +86,10 @@ public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
         }
 
         return Optional.empty();
+    }
+
+    @Override
+    public Predicate<ItemStackSnapshot> getVanillaIngredientPredicate(ItemStackSnapshot ingredient) {
+        return new MatchCraftingVanillaItemStack(ingredient);
     }
 }
