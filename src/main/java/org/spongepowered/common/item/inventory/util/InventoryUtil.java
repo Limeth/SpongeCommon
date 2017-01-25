@@ -51,8 +51,9 @@ public final class InventoryUtil {
         Iterator<IInventory> inventories = fabric.allInventories().iterator();
         InventoryCrafting inventoryCrafting = (InventoryCrafting) inventories.next();
 
-        if(inventories.hasNext())
+        if (inventories.hasNext()) {
             throw new IllegalStateException("Another inventory found: " + inventories.next());
+        }
 
         return inventoryCrafting;
     }

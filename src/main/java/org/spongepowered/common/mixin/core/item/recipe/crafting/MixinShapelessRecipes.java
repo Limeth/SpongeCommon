@@ -49,7 +49,7 @@ public abstract class MixinShapelessRecipes implements IRecipe, ShapelessCraftin
     @Override
     @Nonnull
     public List<Predicate<ItemStackSnapshot>> getIngredientPredicates() {
-        return recipeItems.stream()
+        return this.recipeItems.stream()
                 .map(ItemStackUtil::snapshotOf)
                 .map(MatchCraftingVanillaItemStack::new)
                 .collect(Collectors.toList());

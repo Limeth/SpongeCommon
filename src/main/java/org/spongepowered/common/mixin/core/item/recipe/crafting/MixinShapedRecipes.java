@@ -45,24 +45,24 @@ public abstract class MixinShapedRecipes implements IRecipe, ShapedCraftingRecip
 
     @Override
     public Predicate<ItemStackSnapshot> getIngredientPredicate(int x, int y) {
-        if (x < 0 || x >= recipeWidth || y < 0 || y >= recipeHeight) {
+        if (x < 0 || x >= this.recipeWidth || y < 0 || y >= this.recipeHeight) {
             throw new IndexOutOfBoundsException("Invalid ingredient predicate location");
         }
 
-        int recipeItemIndex = x + y * recipeWidth;
-        ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(recipeItems[recipeItemIndex]);
+        int recipeItemIndex = x + y * this.recipeWidth;
+        ItemStackSnapshot recipeSnapshot = ItemStackUtil.snapshotOf(this.recipeItems[recipeItemIndex]);
 
         return new MatchCraftingVanillaItemStack(recipeSnapshot);
     }
 
     @Override
     public int getWidth() {
-        return recipeWidth;
+        return this.recipeWidth;
     }
 
     @Override
     public int getHeight() {
-        return recipeHeight;
+        return this.recipeHeight;
     }
 
 }

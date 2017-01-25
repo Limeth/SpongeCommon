@@ -43,9 +43,7 @@ public class MatchSmeltingVanillaItemStack implements Predicate<ItemStackSnapsho
     private final ItemStackSnapshot itemStackSnapshot;
 
     public MatchSmeltingVanillaItemStack(ItemStackSnapshot itemStackSnapshot) {
-        checkNotNull(itemStackSnapshot, "The itemStackSnapshot must not be null");
-
-        this.itemStackSnapshot = itemStackSnapshot;
+        this.itemStackSnapshot = checkNotNull(itemStackSnapshot, "The itemStackSnapshot must not be null");
     }
 
     @Override
@@ -65,12 +63,11 @@ public class MatchSmeltingVanillaItemStack implements Predicate<ItemStackSnapsho
      *
      * @see FurnaceRecipes#compareItemStacks(ItemStack, ItemStack)
      */
-    public static boolean compareItemStacks(@Nonnull ItemStack stack1, @Nonnull ItemStack stack2)
-    {
+    public static boolean compareItemStacks(@Nonnull ItemStack stack1, @Nonnull ItemStack stack2) {
         checkNotNull(stack1, "stack1");
         checkNotNull(stack2, "stack2");
 
-        return stack2.getItem() == stack1.getItem() && (stack2.getMetadata() == 32767 || stack2.getMetadata() == stack1.getMetadata());
+        return stack2.getItem() == stack1.getItem() && (stack2.getMetadata() == Short.MAX_VALUE || stack2.getMetadata() == stack1.getMetadata());
     }
 
 }

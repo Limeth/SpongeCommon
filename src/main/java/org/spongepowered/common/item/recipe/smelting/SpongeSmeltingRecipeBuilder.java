@@ -34,6 +34,7 @@ import org.spongepowered.api.item.recipe.smelting.SmeltingRecipe;
 import java.util.function.Predicate;
 
 public class SpongeSmeltingRecipeBuilder implements SmeltingRecipe.Builder {
+
     private ItemStackSnapshot exemplaryResult;
     private ItemStackSnapshot exemplaryIngredient;
     private Predicate<ItemStackSnapshot> ingredientPredicate;
@@ -41,6 +42,8 @@ public class SpongeSmeltingRecipeBuilder implements SmeltingRecipe.Builder {
 
     @Override
     public SmeltingRecipe.Builder from(SmeltingRecipe value) {
+        checkNotNull(value, "value");
+
         this.exemplaryResult = value.getExemplaryResult();
         this.exemplaryIngredient = value.getExemplaryIngredient();
         this.experience = 0;
@@ -101,14 +104,15 @@ public class SpongeSmeltingRecipeBuilder implements SmeltingRecipe.Builder {
     @SuppressWarnings("ConstantConditions")
     @Override
     public SmeltingRecipe build() {
-        checkState(exemplaryResult != null && exemplaryResult != ItemStackSnapshot.NONE,
+        checkState(this.exemplaryResult != null && this.exemplaryResult != ItemStackSnapshot.NONE,
                 "The result must be specified.");
-        checkState(exemplaryIngredient != null && exemplaryIngredient != ItemStackSnapshot.NONE,
+        checkState(this.exemplaryIngredient != null && this.exemplaryIngredient != ItemStackSnapshot.NONE,
                 "The ingredient must be specified.");
-        checkState(ingredientPredicate != null, "You must specify the ingredient predicate.");
-        checkState(ingredientPredicate.test(exemplaryIngredient), "The ingredient predicate does not allow the specified exemplary ingredient.");
-        checkState(experience >= 0, "The experience must be non-negative.");
+        checkState(this.ingredientPredicate != null, "You must specify the ingredient predicate.");
+        checkState(this.ingredientPredicate.test(this.exemplaryIngredient), "The ingredient predicate does not allow the specified exemplary ingredient.");
+        checkState(this.experience >= 0, "The experience must be non-negative.");
 
-        return new SpongeSmeltingRecipe(exemplaryResult, exemplaryIngredient, ingredientPredicate, experience);
+        return new SpongeSmeltingRecipe(this.exemplaryResult, this.exemplaryIngredient, this.ingredientPredicate, this.experience);
     }
+
 }

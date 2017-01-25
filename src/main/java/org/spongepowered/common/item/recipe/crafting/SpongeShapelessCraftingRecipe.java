@@ -24,7 +24,9 @@
  */
 package org.spongepowered.common.item.recipe.crafting;
 
-import com.google.common.base.Preconditions;
+import static com.google.common.base.Preconditions.checkArgument;
+import static com.google.common.base.Preconditions.checkNotNull;
+
 import com.google.common.collect.ImmutableList;
 import com.google.common.collect.Lists;
 import net.minecraft.inventory.InventoryCrafting;
@@ -53,11 +55,11 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
     public SpongeShapelessCraftingRecipe(ItemStackSnapshot exemplaryResult, List<Predicate<ItemStackSnapshot>> ingredients) {
         super(ItemStackUtil.fromSnapshotToNative(exemplaryResult), null);
 
-        Preconditions.checkNotNull(exemplaryResult, "exemplaryResult");
-        Preconditions.checkArgument(exemplaryResult != ItemStackSnapshot.NONE, "exemplaryResult");
+        checkNotNull(exemplaryResult, "exemplaryResult");
+        checkArgument(exemplaryResult != ItemStackSnapshot.NONE, "exemplaryResult");
 
         ingredients.forEach(ingredient ->
-                Preconditions.checkNotNull(ingredient, "The ingredient list must not contain null values."));
+                checkNotNull(ingredient, "The ingredient list must not contain null values."));
 
         this.exemplaryResult = exemplaryResult;
         this.ingredients = ImmutableList.copyOf(ingredients);
@@ -65,12 +67,12 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
 
     @Override
     public ItemStackSnapshot getExemplaryResult() {
-        return exemplaryResult;
+        return this.exemplaryResult;
     }
 
     @Override
     public List<Predicate<ItemStackSnapshot>> getIngredientPredicates() {
-        return ingredients;
+        return this.ingredients;
     }
 
     @Override
@@ -85,7 +87,7 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
                         .orElse(ItemStackSnapshot.NONE);
 
                 if (itemStackSnapshot == ItemStackSnapshot.NONE) {
-                    continue byIncreasingTheSlotIndex;
+                    continue;
                 }
 
                 Iterator<Predicate<ItemStackSnapshot>> iterator = ingredients.iterator();
@@ -109,11 +111,13 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
 
     @Override
     public ItemStackSnapshot getResult(GridInventory grid) {
-        return exemplaryResult;
+        return this.exemplaryResult;
     }
 
     @Override
     public List<ItemStackSnapshot> getRemainingItems(GridInventory grid) {
+        checkNotNull(grid, "grid");
+
         return StreamSupport.stream(grid.<Slot>slots().spliterator(), false)
                 .map(Slot::peek)
                 .map(potentialItem -> potentialItem.flatMap(SpongeImplHooks::getContainerItem))
@@ -123,7 +127,7 @@ public class SpongeShapelessCraftingRecipe extends ShapelessRecipes implements S
 
     @Override
     public int getSize() {
-        return ingredients.size();
+        return this.ingredients.size();
     }
 
     // IRecipe

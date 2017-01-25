@@ -111,7 +111,7 @@ public abstract class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
     public Optional<SmeltingRecipe> findMatchingRecipe(ItemStackSnapshot ingredient) {
         checkNotNull(ingredient, "ingredient");
 
-        for (SmeltingRecipe customRecipe : customRecipes) {
+        for (SmeltingRecipe customRecipe : this.customRecipes) {
             if (customRecipe.isValid(ingredient)) {
                 return Optional.of(customRecipe);
             }
@@ -119,12 +119,10 @@ public abstract class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
 
         ItemStack nativeIngredient = ItemStackUtil.fromSnapshotToNative(ingredient);
 
-        for (Map.Entry<ItemStack, ItemStack> entry : this.smeltingList.entrySet())
-        {
+        for (Map.Entry<ItemStack, ItemStack> entry : this.smeltingList.entrySet()) {
             ItemStack nativeIngredientPrecise = entry.getKey();
 
-            if (compareItemStacks(nativeIngredient, nativeIngredientPrecise))
-            {
+            if (compareItemStacks(nativeIngredient, nativeIngredientPrecise)) {
                 ItemStack nativeExemplaryResult = entry.getValue();
                 ItemStackSnapshot result = ItemStackUtil.snapshotOf(nativeExemplaryResult);
                 ItemStackSnapshot ingredientPrecise = ItemStackUtil.snapshotOf(nativeIngredientPrecise);
@@ -142,7 +140,7 @@ public abstract class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
     @Override
     public void register(SmeltingRecipe recipe) {
         checkNotNull(recipe, "recipe");
-        checkArgument(!customRecipeToNativeIngredient.containsKey(recipe),
+        checkArgument(!this.customRecipeToNativeIngredient.containsKey(recipe),
                 "This recipe has already been registered!");
 
         ItemStackSnapshot exemplaryIngredient = recipe.getExemplaryIngredient();
@@ -180,22 +178,22 @@ public abstract class MixinFurnaceRecipes implements SmeltingRecipeRegistry {
     public Collection<SmeltingRecipe> getRecipes() {
         ImmutableList.Builder<SmeltingRecipe> builder = ImmutableList.builder();
 
-        for (Map.Entry<ItemStack, ItemStack> smeltingEntry : smeltingList.entrySet()) {
+        for (Map.Entry<ItemStack, ItemStack> smeltingEntry : this.smeltingList.entrySet()) {
             ItemStack nativeIngredient = smeltingEntry.getKey();
 
             // If not a custom recipe, add first
-            if (!nativeIngredientToCustomRecipe.containsKey(nativeIngredient)) {
+            if (!this.nativeIngredientToCustomRecipe.containsKey(nativeIngredient)) {
                 ItemStack nativeExemplaryResult = smeltingEntry.getValue();
                 ItemStackSnapshot exemplaryResult = ItemStackUtil.snapshotOf(nativeExemplaryResult);
                 ItemStackSnapshot exemplaryIngredient = ItemStackUtil.snapshotOf(nativeIngredient);
                 Predicate<ItemStackSnapshot> ingredientPredicate = new MatchSmeltingVanillaItemStack(exemplaryIngredient);
-                double experience = (double) experienceList.get(nativeExemplaryResult);
+                double experience = (double) this.experienceList.get(nativeExemplaryResult);
 
                 builder.add(new SpongeSmeltingRecipe(exemplaryResult, exemplaryIngredient, ingredientPredicate, experience));
             }
         }
 
-        builder.addAll(customRecipes);
+        builder.addAll(this.customRecipes);
 
         return builder.build();
     }

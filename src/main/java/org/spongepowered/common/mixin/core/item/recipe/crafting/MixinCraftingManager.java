@@ -57,28 +57,27 @@ public abstract class MixinCraftingManager implements CraftingRecipeRegistry {
             recipe = new DelegateSpongeCraftingRecipe(recipe);
         }
 
-        recipes.add((IRecipe) recipe);
+        this.recipes.add((IRecipe) recipe);
         SpongeImplHooks.onCraftingRecipeRegister(recipe);
     }
 
     @SuppressWarnings("SuspiciousMethodCalls")
     @Override
     public void remove(CraftingRecipe recipe) {
-        recipes.remove(recipe);
+        this.recipes.remove(recipe);
     }
 
     @SuppressWarnings("unchecked")
     @Override
     public Collection<CraftingRecipe> getRecipes() {
-        return Collections.unmodifiableList((List<CraftingRecipe>) (List<?>) recipes);
+        return Collections.unmodifiableList((List<CraftingRecipe>) (List<?>) this.recipes);
     }
 
     @Override
     public Optional<CraftingRecipe> findMatchingRecipe(GridInventory grid, World world) {
         InventoryCrafting nativeInventory = InventoryUtil.toNativeInventory(grid);
 
-        for (IRecipe irecipe : this.recipes)
-        {
+        for (IRecipe irecipe : this.recipes) {
             if (irecipe.matches(nativeInventory, (net.minecraft.world.World) world))
             {
                 return Optional.of((CraftingRecipe) irecipe);
